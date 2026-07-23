@@ -52,12 +52,25 @@ const AppHeader: React.FC<AppHeaderProps> = ({ collapsed, setCollapsed }) => {
     },
   ];
 
+  const isDark = theme === 'dark';
+
   return (
     <Header
-      className={`flex justify-between items-center px-4 border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '0 16px',
+        background: isDark ? '#141414' : '#fff',
+        borderBottom: `1px solid ${isDark ? '#2a2a2a' : '#f0f0f0'}`,
+        color: isDark ? '#e5e5e5' : '#1a1a1a',
+      }}
     >
-      {/* LEFT */}
-      <div className="text-xl cursor-pointer" onClick={() => setCollapsed(!collapsed)}>
+      {/* LEFT — toggle sidebar */}
+      <div
+        style={{ fontSize: 20, cursor: 'pointer', color: isDark ? '#e5e5e5' : '#333' }}
+        onClick={() => setCollapsed(!collapsed)}
+      >
         {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
       </div>
 
@@ -65,12 +78,12 @@ const AppHeader: React.FC<AppHeaderProps> = ({ collapsed, setCollapsed }) => {
       <div className="flex items-center gap-6">
         {/* Notification */}
         <Badge count={0} size="small">
-          <BellOutlined className="text-lg cursor-pointer" />
+          <BellOutlined style={{ fontSize: 18, cursor: 'pointer', color: isDark ? '#bbb' : '#555' }} />
         </Badge>
 
-        {/* Theme switch */}
+        {/* Theme switch — Sun = dark mode bật, Moon = light mode */}
         <Switch
-          checked={theme === 'dark'}
+          checked={isDark}
           onChange={toggleTheme}
           checkedChildren={<SunOutlined />}
           unCheckedChildren={<MoonOutlined />}
@@ -79,13 +92,14 @@ const AppHeader: React.FC<AppHeaderProps> = ({ collapsed, setCollapsed }) => {
         {/* User dropdown */}
         <Dropdown menu={{ items: menuItems }} placement="bottomRight">
           <div className="flex items-center gap-2 cursor-pointer">
-            <UserAvatar size={46} />
-
+            <UserAvatar size={40} />
             <div className="flex flex-col leading-tight">
-              <span className="text-red-500 text-sm font-medium">
+              <span style={{ fontSize: 13, fontWeight: 600, color: isDark ? '#e5e5e5' : '#1a1a1a' }}>
                 {user?.fullName || user?.email}
               </span>
-              <span className="text-xs text-gray-400">{user?.role}</span>
+              <span style={{ fontSize: 11, color: isDark ? '#888' : '#999' }}>
+                {user?.role}
+              </span>
             </div>
           </div>
         </Dropdown>
