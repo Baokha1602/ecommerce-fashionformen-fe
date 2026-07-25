@@ -16,6 +16,7 @@ import ProductDetailPage from '@/features/shop/pages/ProductDetailPage';
 // ── Admin Pages ───────────────────────────────────────────────
 import AdminDashboardPage from '@/features/admin/pages/AdminDashboardPage';
 import RanksPage from '@/features/ranks/pages/RanksPage';
+import CategoryPage from '@/features/category/pages/CategoryPage';
 
 // ── Page Stub (placeholder cho các trang chưa xây dựng) ───────
 const PageStub = ({ name }: { name: string }) => (
@@ -116,7 +117,7 @@ export const router = createBrowserRouter([
 
           // ── Catalog ──────────────────────────────────────
           { path: '/admin/products',   element: <PageStub name="Quản lý Sản phẩm" /> },
-          { path: '/admin/categories', element: <PageStub name="Quản lý Danh mục" /> },
+          { path: '/admin/categories', element: <CategoryPage /> },
           { path: '/admin/brands',     element: <PageStub name="Quản lý Thương hiệu" /> },
 
           // ── Orders ───────────────────────────────────────
