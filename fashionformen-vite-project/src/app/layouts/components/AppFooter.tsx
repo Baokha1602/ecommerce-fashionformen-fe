@@ -119,7 +119,7 @@ export const AppFooter: React.FC = () => {
 
       {/* BOTTOM */}
       <div className="container mx-auto px-6 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-gray-500 font-medium">
-        <p>© Bản quyền thuộc về FASHIONFORMEN. All rights reserved. Created for Yoedu Course.</p>
+        <p>© Bản quyền thuộc về FASHIONFORMEN. All rights reserved.</p>
         <div className="flex items-center gap-6 text-gray-400">
           <a href="#" className="hover:text-white transition-colors">Chính sách bảo mật</a>
           <a href="#" className="hover:text-white transition-colors">Điều khoản dịch vụ</a>

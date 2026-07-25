@@ -27,12 +27,35 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({ onCartClick }) => 
     navigate('/');
   };
 
+  const userRole = (user?.role || user?.userRole)?.toUpperCase();
+  const isAdminOrStaff = userRole === 'ADMIN' || userRole === 'STAFF';
+
   const userMenuItems = [
+    ...(isAdminOrStaff
+      ? [
+          {
+            key: 'admin',
+            icon: <DashboardOutlined />,
+            label: 'Trang quản trị',
+            onClick: () => navigate('/admin'),
+          },
+        ]
+      : [
+          {
+            key: 'account',
+            icon: <UserOutlined />,
+            label: 'Tài khoản của tôi',
+            onClick: () => navigate('/account'),
+          },
+          {
+            key: 'orders',
+            icon: <ShoppingCartOutlined />,
+            label: 'Đơn hàng của tôi',
+            onClick: () => navigate('/account/orders'),
+          },
+        ]),
     {
-      key: 'admin',
-      icon: <DashboardOutlined />,
-      label: 'Trang quản trị',
-      onClick: () => navigate('/admin'),
+      type: 'divider' as const,
     },
     {
       key: 'logout',

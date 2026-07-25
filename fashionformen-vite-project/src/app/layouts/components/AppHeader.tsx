@@ -98,7 +98,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({ collapsed, setCollapsed }) => {
                 {user?.fullName || user?.email}
               </span>
               <span style={{ fontSize: 11, color: isDark ? '#888' : '#999' }}>
-                {user?.role}
+                {(user?.role || user?.userRole)?.toUpperCase()}
               </span>
             </div>
           </div>

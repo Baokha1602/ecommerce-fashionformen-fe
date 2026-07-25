@@ -40,8 +40,7 @@ export const getMeThunk = createAsyncThunk<User, void, { rejectValue: string }>(
   'auth/getMe',
   async (_, { rejectWithValue }) => {
     try {
-      // Since the backend does not expose a get profile (/me) endpoint,
-      // we load the authenticated user object from storage.
+      
       const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
       if (!userStr) {
         throw new Error('User data not found in storage');

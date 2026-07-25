@@ -57,10 +57,10 @@ const NAV_ENTRIES: NavEntry[] = [
   { key: '/admin/categories', icon: <AppstoreOutlined />, label: 'Quản lý Danh mục',    roles: ['ADMIN'] },
   { key: '/admin/brands',     icon: <BarcodeOutlined />,  label: 'Quản lý Thương hiệu', roles: ['ADMIN'] },
 
-  { type: 'divider', key: 'd-ops', label: 'Vận hành' },
-  { key: '/admin/orders',          icon: <InboxOutlined />, label: 'Quản lý Đơn hàng' },
-  { key: '/admin/orders/shipping', icon: <TruckOutlined />, label: 'Xử lý Giao hàng' },
-  { key: '/admin/inventory',       icon: <InboxOutlined />, label: 'Quản lý Kho hàng' },
+  { type: 'divider', key: 'd-ops', label: 'Vận hành', roles: ['ADMIN', 'STAFF'] },
+  { key: '/admin/orders',          icon: <InboxOutlined />, label: 'Quản lý Đơn hàng', roles: ['ADMIN', 'STAFF'] },
+  { key: '/admin/orders/shipping', icon: <TruckOutlined />, label: 'Xử lý Giao hàng', roles: ['ADMIN', 'STAFF'] },
+  { key: '/admin/inventory',       icon: <InboxOutlined />, label: 'Quản lý Kho hàng', roles: ['ADMIN', 'STAFF'] },
 
   { type: 'divider', key: 'd-customers', label: 'Khách hàng', roles: ['ADMIN'] },
   { key: '/admin/customers',       icon: <TeamOutlined />,  label: 'Quản lý Khách hàng',      roles: ['ADMIN'] },
@@ -74,8 +74,8 @@ const NAV_ENTRIES: NavEntry[] = [
   { key: '/admin/vouchers',   icon: <TagsOutlined />,    label: 'Mã giảm giá / Voucher',   roles: ['ADMIN'] },
   { key: '/admin/banners',    icon: <PictureOutlined />, label: 'Banner Quảng cáo',        roles: ['ADMIN'] },
 
-  { type: 'divider', key: 'd-support', label: 'Hỗ trợ' },
-  { key: '/admin/support', icon: <CustomerServiceOutlined />, label: 'Hỗ trợ Khách hàng' },
+  { type: 'divider', key: 'd-support', label: 'Hỗ trợ', roles: ['ADMIN', 'STAFF'] },
+  { key: '/admin/support', icon: <CustomerServiceOutlined />, label: 'Hỗ trợ Khách hàng', roles: ['ADMIN', 'STAFF'] },
 
   { type: 'divider', key: 'd-system', label: 'Hệ thống', roles: ['ADMIN'] },
   { key: '/admin/reports',  icon: <BarChartOutlined />, label: 'Báo cáo Doanh thu', roles: ['ADMIN'] },
@@ -88,7 +88,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed }) => {
   const isDark = theme === 'dark';
   const navigate = useNavigate();
   const location = useLocation();
-  const role = user?.role;
+  const role = (user?.role || user?.userRole)?.toUpperCase();
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showBottomFade, setShowBottomFade] = useState(true);
@@ -109,7 +109,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed }) => {
   }, []);
 
   const filteredEntries = NAV_ENTRIES.filter(
-    (e) => !e.roles || e.roles.includes(role!),
+    (e) => !e.roles || (role && e.roles.some((r) => r.toUpperCase() === role)),
   );
 
   const menuItems: MenuProps['items'] = filteredEntries.map((entry) => {

@@ -18,7 +18,13 @@ const LoginPage: React.FC = () => {
       const resultAction = await dispatch(loginThunk(values));
       if (loginThunk.fulfilled.match(resultAction)) {
         message.success('Đăng nhập thành công!');
-        navigate('/');
+        const loggedUser = resultAction.payload;
+        const role = (loggedUser?.role || loggedUser?.userRole)?.toUpperCase();
+        if (role === 'ADMIN' || role === 'STAFF') {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
       } else {
         message.error(resultAction.payload as string);
       }
@@ -117,9 +123,9 @@ const LoginPage: React.FC = () => {
                   Ghi nhớ đăng nhập
                 </Checkbox>
               </Form.Item>
-              <a href="#" className="text-xs font-semibold text-[#c5a880] hover:text-[#d4af37] transition-all">
+              <Link to="/auth/forgot-password" className="text-xs font-semibold text-[#c5a880] hover:text-[#d4af37] transition-all">
                 Quên mật khẩu?
-              </a>
+              </Link>
             </div>
 
             {/* Submit Button */}
