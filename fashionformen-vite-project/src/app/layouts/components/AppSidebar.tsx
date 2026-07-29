@@ -61,6 +61,26 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed }) => {
           label: 'Sản phẩm',
         },
         {
+          key: '/admin/products/variants',
+          icon: <ShoppingOutlined />,
+          label: 'Biến thể sản phẩm',
+        },
+        {
+          key: '/admin/products/images',
+          icon: <ShoppingOutlined />,
+          label: 'Hình ảnh sản phẩm',
+        },
+        {
+          key: '/admin/products/tags',
+          icon: <TagsOutlined />,
+          label: 'Gán Tag Sản phẩm',
+        },
+        {
+          key: '/admin/products/reviews',
+          icon: <TeamOutlined />,
+          label: 'Đánh giá Sản phẩm',
+        },
+        {
           key: '/admin/categories',
           icon: <AppstoreOutlined />,
           label: 'Danh mục',
@@ -170,10 +190,22 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed }) => {
 
     // ── SETTINGS ──────────────────────────────────────────────────
     {
-      key: '/admin/settings',
+      key: 'settings',
       icon: <SettingOutlined />,
-      label: 'Cài đặt Hệ thống',
+      label: 'Cài đặt & Khác',
       roles: ['ADMIN'],
+      children: [
+        {
+          key: '/admin/settings',
+          icon: <SettingOutlined />,
+          label: 'Cài đặt Hệ thống',
+        },
+        {
+          key: '/admin/tags',
+          icon: <TagsOutlined />,
+          label: 'Quản lý Tag chung',
+        },
+      ],
     },
   ];
 

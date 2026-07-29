@@ -16,6 +16,19 @@ import ProductDetailPage from '@/features/shop/pages/ProductDetailPage';
 // ── Admin Pages ───────────────────────────────────────────────
 import AdminDashboardPage from '@/features/admin/pages/AdminDashboardPage';
 
+// ── Catalog Pages ──────────────────────────────────────────────
+import CategoryPage from '@/features/catalog/pages/CategoryPage';
+import BrandPage from '@/features/catalog/pages/BrandPage';
+// Các trang này đã bị xóa mất file, tạm thời dùng PageStub
+// import TagPage from '@/features/catalog/pages/TagPage';
+// import RankPage from '@/features/catalog/pages/RankPage';
+import ProductPage from '@/features/catalog/pages/ProductPage';
+import ProductVariantPage from '@/features/catalog/pages/ProductVariantPage';
+import ProductImagePage from '@/features/catalog/pages/ProductImagePage';
+import ProductTagPage from '@/features/catalog/pages/ProductTagPage';
+import ProductReviewPage from '@/features/catalog/pages/ProductReviewPage';
+import ShopPage from '@/features/shop/pages/ShopPage';
+
 // ── Page Stub (placeholder cho các trang chưa xây dựng) ───────
 const PageStub = ({ name }: { name: string }) => (
   <div className="p-8 bg-white rounded-2xl border border-gray-100 shadow-sm max-w-2xl space-y-4">
@@ -46,7 +59,7 @@ export const router = createBrowserRouter([
       // Danh sách sản phẩm
       {
         path: '/shop',
-        element: <PageStub name="Cửa hàng - Danh sách sản phẩm" />,
+        element: <ShopPage />,
       },
       // Chi tiết sản phẩm
       {
@@ -113,19 +126,23 @@ export const router = createBrowserRouter([
           { path: '/admin',            element: <AdminDashboardPage /> },
           { path: '/profile',          element: <PageStub name="Thông tin cá nhân" /> },
 
-          // ── Catalog ──────────────────────────────────────
-          { path: '/admin/products',   element: <PageStub name="Quản lý Sản phẩm" /> },
-          { path: '/admin/categories', element: <PageStub name="Quản lý Danh mục" /> },
-          { path: '/admin/brands',     element: <PageStub name="Quản lý Thương hiệu" /> },
+          // ── Catalog (Tạm thời là PageStub vì mất file) ──────────────────────────────────────
+          { path: '/admin/products',         element: <ProductPage /> },
+          { path: '/admin/products/variants',element: <ProductVariantPage /> },
+          { path: '/admin/products/images',  element: <ProductImagePage /> },
+          { path: '/admin/products/tags',    element: <ProductTagPage /> },
+          { path: '/admin/products/reviews', element: <ProductReviewPage /> },
+          { path: '/admin/categories',       element: <CategoryPage /> },
+          { path: '/admin/brands',           element: <BrandPage /> },
 
-          // ── Orders ───────────────────────────────────────
+          // ── Orders ─────────────────────────────────────────
           { path: '/admin/orders',          element: <PageStub name="Quản lý Đơn hàng" /> },
           { path: '/admin/orders/shipping', element: <PageStub name="Xử lý Giao hàng" /> },
 
-          // ── Inventory ─────────────────────────────────────
+          // ── Inventory ───────────────────────────────────────
           { path: '/admin/inventory',  element: <PageStub name="Kho hàng" /> },
 
-          // ── Customers ────────────────────────────────────
+          // ── Customers ────────────────────────────────────────
           { path: '/admin/customers',       element: <PageStub name="Khách hàng" /> },
           { path: '/admin/customers/ranks', element: <PageStub name="Hạng thành viên" /> },
 
@@ -145,6 +162,7 @@ export const router = createBrowserRouter([
 
           // ── Settings ─────────────────────────────────────
           { path: '/admin/settings',   element: <PageStub name="Cài đặt Hệ thống" /> },
+          { path: '/admin/tags',       element: <PageStub name="Kho Tag" /> },
         ],
       },
     ],

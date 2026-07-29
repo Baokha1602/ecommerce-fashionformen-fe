@@ -1,9 +1,9 @@
 import React from 'react';
 import { Button, Dropdown, Badge } from 'antd';
-import { 
-  SearchOutlined, 
-  UserOutlined, 
-  EnvironmentOutlined, 
+import {
+  SearchOutlined,
+  UserOutlined,
+  EnvironmentOutlined,
   ShoppingCartOutlined,
   LogoutOutlined,
   DashboardOutlined
@@ -52,17 +52,17 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({ onCartClick }) => 
 
       {/* NAVIGATION MENU */}
       <nav className="hidden md:flex items-center gap-8 text-sm font-semibold tracking-wide uppercase">
-        <a href="#" className="text-slate-800 hover:text-[#c5a880] transition-colors">Sản phẩm</a>
-        <a href="#" className="relative text-slate-800 hover:text-[#c5a880] transition-colors">
+        <a href="/shop" onClick={(e) => { e.preventDefault(); navigate('/shop'); }} className="text-slate-800 hover:text-[#c5a880] transition-colors">Sản phẩm</a>
+        <a href="/shop?type=new" onClick={(e) => { e.preventDefault(); navigate('/shop?type=new'); }} className="relative text-slate-800 hover:text-[#c5a880] transition-colors">
           Hàng Mới
           <span className="absolute -top-3 -right-6 bg-red-500 text-[9px] text-white font-bold px-1 py-0.5 rounded uppercase scale-75 animate-pulse">
             New
           </span>
         </a>
-        <a href="#" className="text-slate-800 hover:text-[#c5a880] transition-colors">Hàng Bán Chạy</a>
-        <a href="#" className="text-slate-800 hover:text-[#c5a880] transition-colors">DENIM</a>
-        <a href="#" className="text-red-600 hover:text-red-500 font-bold transition-colors">OUTLET</a>
-        <a href="#" className="text-slate-800 hover:text-[#c5a880] transition-colors">Collection</a>
+        <a href="/shop?type=best-seller" onClick={(e) => { e.preventDefault(); navigate('/shop?type=best-seller'); }} className="text-slate-800 hover:text-[#c5a880] transition-colors">Hàng Bán Chạy</a>
+        <a href="/shop?category=denim" onClick={(e) => { e.preventDefault(); navigate('/shop?category=denim'); }} className="text-slate-800 hover:text-[#c5a880] transition-colors">DENIM</a>
+        <a href="/shop?category=outlet" onClick={(e) => { e.preventDefault(); navigate('/shop?category=outlet'); }} className="text-red-600 hover:text-red-500 font-bold transition-colors">OUTLET</a>
+        <a href="/collections" onClick={(e) => { e.preventDefault(); navigate('/collections'); }} className="text-slate-800 hover:text-[#c5a880] transition-colors">Collection</a>
       </nav>
 
       {/* RIGHT ACTIONS */}
