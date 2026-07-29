@@ -17,6 +17,7 @@ import {
   CrownOutlined,
   PictureOutlined,
   BarcodeOutlined,
+  EnvironmentOutlined,
 } from '@ant-design/icons';
 import YoeduLogo from '@/assets/images/logo fashion for men.png';
 import { useTheme } from '@/app/providers/theme/hooks/useTheme';
@@ -56,6 +57,7 @@ const NAV_ENTRIES: NavEntry[] = [
   { key: '/admin/products',   icon: <ShoppingOutlined />, label: 'Quản lý Sản phẩm',   roles: ['ADMIN'] },
   { key: '/admin/categories', icon: <AppstoreOutlined />, label: 'Quản lý Danh mục',    roles: ['ADMIN'] },
   { key: '/admin/brands',     icon: <BarcodeOutlined />,  label: 'Quản lý Thương hiệu', roles: ['ADMIN'] },
+  { key: '/admin/tags',       icon: <TagsOutlined />,     label: 'Quản lý Tags',         roles: ['ADMIN'] },
 
   { type: 'divider', key: 'd-ops', label: 'Vận hành', roles: ['ADMIN', 'STAFF'] },
   { key: '/admin/orders',          icon: <InboxOutlined />, label: 'Quản lý Đơn hàng', roles: ['ADMIN', 'STAFF'] },
@@ -63,8 +65,9 @@ const NAV_ENTRIES: NavEntry[] = [
   { key: '/admin/inventory',       icon: <InboxOutlined />, label: 'Quản lý Kho hàng', roles: ['ADMIN', 'STAFF'] },
 
   { type: 'divider', key: 'd-customers', label: 'Khách hàng', roles: ['ADMIN'] },
-  { key: '/admin/customers',       icon: <TeamOutlined />,  label: 'Quản lý Khách hàng',      roles: ['ADMIN'] },
-  { key: '/admin/customers/ranks', icon: <CrownOutlined />, label: 'Quản lý Hạng thành viên', roles: ['ADMIN'] },
+  { key: '/admin/customers',            icon: <TeamOutlined />,        label: 'Quản lý Khách hàng',      roles: ['ADMIN'] },
+  { key: '/admin/customers/ranks',      icon: <CrownOutlined />,       label: 'Quản lý Hạng thành viên', roles: ['ADMIN'] },
+  { key: '/admin/customers/addresses',  icon: <EnvironmentOutlined />, label: 'Sổ địa chỉ',              roles: ['ADMIN'] },
 
   { type: 'divider', key: 'd-hr', label: 'Nhân sự', roles: ['ADMIN'] },
   { key: '/admin/staff', icon: <UserSwitchOutlined />, label: 'Quản lý Nhân viên', roles: ['ADMIN'] },

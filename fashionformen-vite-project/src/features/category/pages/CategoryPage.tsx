@@ -6,6 +6,8 @@ import {
   Typography,
   Space,
   Input,
+  Segmented,
+  Tooltip,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -14,6 +16,9 @@ import {
   DeleteOutlined,
   AppstoreOutlined,
   SearchOutlined,
+  StopOutlined,
+  UndoOutlined,
+  ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@/app/redux/hooks';
 import {
@@ -25,6 +30,7 @@ import {
 import { clearError } from '../store/category-slice';
 import { CategoryFormModal } from '../components/CategoryFormModal';
 import type { CategoryResponse, CategoryUpsertRequest } from '../types/category-type';
+import { ensureArray } from '@/shared/lib/ensure-array';
 
 const { Title, Text } = Typography;
 
@@ -36,6 +42,10 @@ const CategoryPage: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<CategoryResponse | null>(null);
   const [searchText, setSearchText] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'TRASH'>('ALL');
+
+  // Quản lý trạng thái xóa mềm local nếu DTO chưa trả isActive
+  const [softDeletedIds, setSoftDeletedIds] = useState<number[]>([]);
 
   useEffect(() => {
     dispatch(fetchAllCategoriesThunk());
@@ -68,33 +78,51 @@ const CategoryPage: React.FC = () => {
     }
   };
 
-  const handleDelete = (record: CategoryResponse) => {
+  // ── XÓA MỀM (SOFT DELETE / KHÔI PHỤC) ──
+  const handleSoftDeleteToggle = (record: CategoryResponse) => {
+    const isSoftDeleted = softDeletedIds.includes(record.id!);
+    if (isSoftDeleted) {
+      setSoftDeletedIds((prev) => prev.filter((id) => id !== record.id));
+      message.success(`Đã khôi phục danh mục "${record.name}"!`);
+    } else {
+      setSoftDeletedIds((prev) => [...prev, record.id!]);
+      message.info(`Đã chuyển danh mục "${record.name}" vào Thùng rác (Xóa mềm)!`);
+    }
+  };
+
+  // ── XÓA CỨNG (HARD DELETE) ──
+  const handleHardDelete = (record: CategoryResponse) => {
     modal.confirm({
-      title: 'Xác nhận xóa',
+      title: '⚠️ CẢNH BÁO: Xóa vĩnh viễn (Xóa cứng)',
+      icon: <ExclamationCircleOutlined className="text-red-500" />,
       content: (
-        <span>
-          Bạn có chắc muốn xóa danh mục{' '}
-          <strong style={{ color: '#c5a880' }}>{record.name}</strong> không?
-        </span>
+        <div>
+          <p>Bạn có chắc chắn muốn <strong>xóa vĩnh viễn danh mục</strong> <span className="text-red-600 font-bold">"{record.name}"</span> không?</p>
+          <p className="text-xs text-gray-500 mt-1">Dữ liệu sẽ bị xóa hoàn toàn khỏi cơ sở dữ liệu và không thể khôi phục!</p>
+        </div>
       ),
-      okText: 'Xóa',
+      okText: 'Xóa vĩnh viễn',
       okButtonProps: { danger: true },
       cancelText: 'Hủy',
       onOk: async () => {
         const result = await dispatch(deleteCategoryThunk(record.id!));
         if (deleteCategoryThunk.fulfilled.match(result)) {
-          message.success('Xóa danh mục thành công!');
+          setSoftDeletedIds((prev) => prev.filter((id) => id !== record.id));
+          message.success(`Đã xóa vĩnh viễn danh mục "${record.name}" thành công!`);
         }
       },
     });
   };
 
-  // Lọc theo search text
-  const filteredList = searchText
-    ? list.filter((c) =>
-        c.name?.toLowerCase().includes(searchText.toLowerCase()),
-      )
-    : list;
+  const categories = ensureArray(list);
+  const filteredList = categories.filter((c) => {
+    const isSoftDeleted = softDeletedIds.includes(c.id!);
+    if (statusFilter === 'ACTIVE' && isSoftDeleted) return false;
+    if (statusFilter === 'TRASH' && !isSoftDeleted) return false;
+
+    if (!searchText) return true;
+    return c.name?.toLowerCase().includes(searchText.toLowerCase());
+  });
 
   const columns: ColumnsType<CategoryResponse> = [
     {
@@ -109,44 +137,71 @@ const CategoryPage: React.FC = () => {
     {
       title: 'Tên danh mục',
       dataIndex: 'name',
-      render: (name: string) => (
-        <span
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-          }}
-        >
+      render: (name: string, record: CategoryResponse) => {
+        const isSoftDeleted = softDeletedIds.includes(record.id!);
+        return (
+          <span className="inline-flex items-center gap-2">
+            <span
+              className="w-2 h-2 rounded-full flex-shrink-0"
+              style={{
+                background: isSoftDeleted
+                  ? '#ff4d4f'
+                  : 'linear-gradient(135deg, #c5a880, #d4af37)',
+              }}
+            />
+            <Text
+              strong
+              style={{
+                color: isSoftDeleted ? '#8c8c8c' : '#1a1a1a',
+                textDecoration: isSoftDeleted ? 'line-through' : 'none',
+              }}
+            >
+              {name}
+            </Text>
+          </span>
+        );
+      },
+    },
+    {
+      title: 'Trạng thái',
+      key: 'status',
+      width: 130,
+      align: 'center',
+      render: (_: unknown, record: CategoryResponse) => {
+        const isSoftDeleted = softDeletedIds.includes(record.id!);
+        return (
           <span
             style={{
-              width: 8,
-              height: 8,
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #c5a880, #d4af37)',
-              flexShrink: 0,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '3px 12px',
+              borderRadius: 20,
+              background: !isSoftDeleted ? '#52c41a18' : '#ff4d4f18',
+              border: `1.5px solid ${!isSoftDeleted ? '#52c41a' : '#ff4d4f'}`,
+              color: !isSoftDeleted ? '#52c41a' : '#ff4d4f',
+              fontWeight: 700,
+              fontSize: 12,
             }}
-          />
-          <Text strong style={{ color: '#1a1a1a' }}>{name}</Text>
-        </span>
-      ),
+          >
+            <span
+              style={{
+                width: 7,
+                height: 7,
+                borderRadius: '50%',
+                background: !isSoftDeleted ? '#52c41a' : '#ff4d4f',
+                flexShrink: 0,
+              }}
+            />
+            {!isSoftDeleted ? 'Hoạt động' : 'Đã xóa mềm'}
+          </span>
+        );
+      },
     },
     {
       title: 'Ngày tạo',
       dataIndex: 'createdAt',
-      width: 140,
-      render: (v: string) =>
-        v ? (
-          <Text type="secondary" className="text-xs">
-            {new Date(v).toLocaleDateString('vi-VN')}
-          </Text>
-        ) : (
-          '—'
-        ),
-    },
-    {
-      title: 'Cập nhật',
-      dataIndex: 'updatedAt',
-      width: 140,
+      width: 130,
       render: (v: string) =>
         v ? (
           <Text type="secondary" className="text-xs">
@@ -159,35 +214,50 @@ const CategoryPage: React.FC = () => {
     {
       title: 'Thao tác',
       align: 'center',
-      width: 100,
-      render: (_: unknown, record: CategoryResponse) => (
-        <Space size={4}>
-          <Button
-            type="text"
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => handleOpenEdit(record)}
-            style={{ color: '#c5a880' }}
-            title="Chỉnh sửa"
-          />
-          <Button
-            type="text"
-            size="small"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record)}
-            title="Xóa"
-          />
-        </Space>
-      ),
+      width: 140,
+      render: (_: unknown, record: CategoryResponse) => {
+        const isSoftDeleted = softDeletedIds.includes(record.id!);
+        return (
+          <Space size={4}>
+            <Tooltip title="Chỉnh sửa">
+              <Button
+                type="text"
+                size="small"
+                icon={<EditOutlined />}
+                onClick={() => handleOpenEdit(record)}
+                style={{ color: '#c5a880' }}
+              />
+            </Tooltip>
+
+            <Tooltip title={isSoftDeleted ? 'Khôi phục hoạt động' : 'Xóa mềm (Chuyển vào Thùng rác)'}>
+              <Button
+                type="text"
+                size="small"
+                icon={isSoftDeleted ? <UndoOutlined /> : <StopOutlined />}
+                onClick={() => handleSoftDeleteToggle(record)}
+                style={{ color: isSoftDeleted ? '#52c41a' : '#fa8c16' }}
+              />
+            </Tooltip>
+
+            <Tooltip title="Xóa cứng (Vĩnh viễn khỏi Database)">
+              <Button
+                type="text"
+                size="small"
+                danger
+                icon={<DeleteOutlined />}
+                onClick={() => handleHardDelete(record)}
+              />
+            </Tooltip>
+          </Space>
+        );
+      },
     },
   ];
 
   return (
-    // Không dùng overflow-auto hay min-h-screen — để layout cha kiểm soát scroll
     <div>
       {/* ── Header ─────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
         <div className="flex items-center gap-3">
           <div
             style={{
@@ -205,29 +275,24 @@ const CategoryPage: React.FC = () => {
           </div>
           <div>
             <Title level={5} style={{ margin: 0, fontWeight: 700, color: '#1a1a1a' }}>
-              Danh mục sản phẩm
+              Quản lý Danh mục (Soft & Hard Delete)
             </Title>
             <Text type="secondary" style={{ fontSize: 12 }}>
-              Quản lý các danh mục phân loại sản phẩm
+              Hỗ trợ xóa mềm (Chuyển thùng rác) & xóa cứng (Xóa vĩnh viễn)
             </Text>
           </div>
         </div>
 
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          {/* Thống kê nhỏ */}
-          <span
-            style={{
-              padding: '4px 12px',
-              borderRadius: 20,
-              background: '#c5a88015',
-              border: '1.5px solid #c5a88030',
-              color: '#c5a880',
-              fontWeight: 700,
-              fontSize: 12,
-            }}
-          >
-            {list.length} danh mục
-          </span>
+          <Segmented
+            options={[
+              { label: `Tất cả (${categories.length})`, value: 'ALL' },
+              { label: 'Hoạt động', value: 'ACTIVE' },
+              { label: `Thùng rác (${softDeletedIds.length})`, value: 'TRASH' },
+            ]}
+            value={statusFilter}
+            onChange={(v) => setStatusFilter(v as 'ALL' | 'ACTIVE' | 'TRASH')}
+          />
 
           <Button
             type="primary"
@@ -242,7 +307,7 @@ const CategoryPage: React.FC = () => {
               color: '#fff',
             }}
           >
-            Thêm danh mục
+            Thêm mới
           </Button>
         </div>
       </div>
@@ -263,7 +328,7 @@ const CategoryPage: React.FC = () => {
         />
       </div>
 
-      {/* ── Table — không set scroll={{ x }} để tránh scrollbar ngang */}
+      {/* ── Table ──────────────────────────────────────────────── */}
       <Table
         rowKey="id"
         columns={columns}
@@ -283,11 +348,6 @@ const CategoryPage: React.FC = () => {
           overflow: 'hidden',
         }}
         rowClassName="hover:bg-[#fafafa] transition-colors"
-        locale={{
-          emptyText: searchText
-            ? `Không tìm thấy danh mục nào với từ khóa "${searchText}"`
-            : 'Chưa có danh mục nào',
-        }}
       />
 
       {/* ── Form Modal ───────────────────────────────────────── */}

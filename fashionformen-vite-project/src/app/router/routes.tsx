@@ -18,6 +18,11 @@ import ProductDetailPage from '@/features/shop/pages/ProductDetailPage';
 import AdminDashboardPage from '@/features/admin/pages/AdminDashboardPage';
 import RanksPage from '@/features/ranks/pages/RanksPage';
 import CategoryPage from '@/features/category/pages/CategoryPage';
+import BrandsPage from '@/features/brands/pages/BrandsPage';
+import TagsPage from '@/features/tags/pages/TagsPage';
+import BannersPage from '@/features/banners/pages/BannersPage';
+import UsersPage from '@/features/users/pages/UsersPage';
+import UserAddressPage from '@/features/user_address/pages/UserAddressPage';
 
 // ── Page Stub (placeholder cho các trang chưa xây dựng) ───────
 const PageStub = ({ name }: { name: string }) => (
@@ -105,11 +110,13 @@ export const router = createBrowserRouter([
               // Catalog
               { path: '/admin/products', element: <PageStub name="Quản lý Sản phẩm" /> },
               { path: '/admin/categories', element: <CategoryPage /> },
-              { path: '/admin/brands', element: <PageStub name="Quản lý Thương hiệu" /> },
+              { path: '/admin/brands', element: <BrandsPage /> },
+              { path: '/admin/tags', element: <TagsPage /> },
 
               // Customers & Ranks
-              { path: '/admin/customers', element: <PageStub name="Khách hàng" /> },
+              { path: '/admin/customers', element: <UsersPage /> },
               { path: '/admin/customers/ranks', element: <RanksPage /> },
+              { path: '/admin/customers/addresses', element: <UserAddressPage /> },
 
               // Staff / HR
               { path: '/admin/staff', element: <PageStub name="Quản lý Nhân viên" /> },
@@ -117,7 +124,7 @@ export const router = createBrowserRouter([
               // Marketing
               { path: '/admin/promotions', element: <PageStub name="Chương trình khuyến mãi" /> },
               { path: '/admin/vouchers', element: <PageStub name="Mã giảm giá / Voucher" /> },
-              { path: '/admin/banners', element: <PageStub name="Banner quảng cáo" /> },
+              { path: '/admin/banners', element: <BannersPage /> },
 
               // Reports & System Settings
               { path: '/admin/reports', element: <PageStub name="Báo cáo Doanh thu" /> },

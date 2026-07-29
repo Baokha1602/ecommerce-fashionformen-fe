@@ -149,6 +149,12 @@ export interface ApiResponseMapStringString {
     'data'?: { [key: string]: string; };
     'timestamp'?: string;
 }
+export interface ApiResponseNotificationResponse {
+    'success'?: boolean;
+    'message'?: string;
+    'data'?: NotificationResponse;
+    'timestamp'?: string;
+}
 export interface ApiResponseObject {
     'success'?: boolean;
     'message'?: string;
@@ -179,10 +185,22 @@ export interface ApiResponseOtpResponse {
     'data'?: OtpResponse;
     'timestamp'?: string;
 }
+export interface ApiResponsePageNotificationResponse {
+    'success'?: boolean;
+    'message'?: string;
+    'data'?: PageNotificationResponse;
+    'timestamp'?: string;
+}
 export interface ApiResponsePageOrderResponse {
     'success'?: boolean;
     'message'?: string;
     'data'?: PageOrderResponse;
+    'timestamp'?: string;
+}
+export interface ApiResponsePageUserResponse {
+    'success'?: boolean;
+    'message'?: string;
+    'data'?: PageUserResponse;
     'timestamp'?: string;
 }
 export interface ApiResponsePaymentUrlResponse {
@@ -239,10 +257,22 @@ export interface ApiResponseTagResponse {
     'data'?: TagResponse;
     'timestamp'?: string;
 }
+export interface ApiResponseUnreadCountResponse {
+    'success'?: boolean;
+    'message'?: string;
+    'data'?: UnreadCountResponse;
+    'timestamp'?: string;
+}
 export interface ApiResponseUserAddressResponse {
     'success'?: boolean;
     'message'?: string;
     'data'?: UserAddressResponse;
+    'timestamp'?: string;
+}
+export interface ApiResponseUserResponse {
+    'success'?: boolean;
+    'message'?: string;
+    'data'?: UserResponse;
     'timestamp'?: string;
 }
 export interface ApiResponseVoid {
@@ -371,6 +401,25 @@ export interface CouponUsageHistoryResponse {
     'userId'?: number;
     'usedAt'?: string;
 }
+export interface NotificationResponse {
+    'id'?: number;
+    'type'?: NotificationResponseTypeEnum;
+    'title'?: string;
+    'body'?: string;
+    'referenceId'?: number;
+    'createdAt'?: string;
+    'read'?: boolean;
+}
+
+export const NotificationResponseTypeEnum = {
+    OrderPlaced: 'ORDER_PLACED',
+    OrderCancelled: 'ORDER_CANCELLED',
+    OrderPaymentSuccess: 'ORDER_PAYMENT_SUCCESS',
+    OrderExpired: 'ORDER_EXPIRED',
+} as const;
+
+export type NotificationResponseTypeEnum = typeof NotificationResponseTypeEnum[keyof typeof NotificationResponseTypeEnum];
+
 export interface OrderAdminResponse {
     'id'?: number;
     'userId'?: number;
@@ -551,11 +600,37 @@ export interface OtpVerifyRequest {
     'email': string;
     'otpCode': string;
 }
-export interface PageOrderResponse {
-    'totalPages'?: number;
+export interface PageNotificationResponse {
     'totalElements'?: number;
+    'totalPages'?: number;
+    'size'?: number;
+    'content'?: Array<NotificationResponse>;
+    'number'?: number;
+    'sort'?: SortObject;
+    'first'?: boolean;
+    'last'?: boolean;
+    'numberOfElements'?: number;
+    'pageable'?: PageableObject;
+    'empty'?: boolean;
+}
+export interface PageOrderResponse {
+    'totalElements'?: number;
+    'totalPages'?: number;
     'size'?: number;
     'content'?: Array<OrderResponse>;
+    'number'?: number;
+    'sort'?: SortObject;
+    'first'?: boolean;
+    'last'?: boolean;
+    'numberOfElements'?: number;
+    'pageable'?: PageableObject;
+    'empty'?: boolean;
+}
+export interface PageUserResponse {
+    'totalElements'?: number;
+    'totalPages'?: number;
+    'size'?: number;
+    'content'?: Array<UserResponse>;
     'number'?: number;
     'sort'?: SortObject;
     'first'?: boolean;
@@ -759,6 +834,9 @@ export interface TagResponse {
 export interface TagUpdateRequest {
     'name'?: string;
     'description'?: string;
+}
+export interface UnreadCountResponse {
+    'unreadCount'?: number;
 }
 export interface UserAddressCreateRequest {
     'userId': number;
@@ -2143,6 +2221,340 @@ export class AdminPromotionControllerApi extends BaseAPI {
     }
 }
 
+
+
+/**
+ * AdminUserControllerApi - axios parameter creator
+ */
+export const AdminUserControllerApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteUser: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('deleteUser', 'id', id)
+            const localVarPath = `/api/users/{id}`
+                .replace('{id}', encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = '*/*';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserById: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getUserById', 'id', id)
+            const localVarPath = `/api/users/{id}`
+                .replace('{id}', encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = '*/*';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {Pageable} pageable 
+         * @param {string} [keyword] 
+         * @param {GetUsersRoleEnum} [role] 
+         * @param {boolean} [isActive] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUsers: async (pageable: Pageable, keyword?: string, role?: GetUsersRoleEnum, isActive?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'pageable' is not null or undefined
+            assertParamExists('getUsers', 'pageable', pageable)
+            const localVarPath = `/api/users`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (keyword !== undefined) {
+                localVarQueryParameter['keyword'] = keyword;
+            }
+
+            if (role !== undefined) {
+                localVarQueryParameter['role'] = role;
+            }
+
+            if (isActive !== undefined) {
+                localVarQueryParameter['isActive'] = isActive;
+            }
+
+            if (pageable !== undefined) {
+                for (const [key, value] of Object.entries(pageable)) {
+                    localVarQueryParameter[key] = value;
+                }
+            }
+
+            localVarHeaderParameter['Accept'] = '*/*';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {number} id 
+         * @param {boolean} isActive 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateUserStatus: async (id: number, isActive: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('updateUserStatus', 'id', id)
+            // verify required parameter 'isActive' is not null or undefined
+            assertParamExists('updateUserStatus', 'isActive', isActive)
+            const localVarPath = `/api/users/{id}/status`
+                .replace('{id}', encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (isActive !== undefined) {
+                localVarQueryParameter['isActive'] = isActive;
+            }
+
+            localVarHeaderParameter['Accept'] = '*/*';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * AdminUserControllerApi - functional programming interface
+ */
+export const AdminUserControllerApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = AdminUserControllerApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteUser(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteUser(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminUserControllerApi.deleteUser']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getUserById(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseUserResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getUserById(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminUserControllerApi.getUserById']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {Pageable} pageable 
+         * @param {string} [keyword] 
+         * @param {GetUsersRoleEnum} [role] 
+         * @param {boolean} [isActive] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getUsers(pageable: Pageable, keyword?: string, role?: GetUsersRoleEnum, isActive?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageUserResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getUsers(pageable, keyword, role, isActive, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminUserControllerApi.getUsers']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {number} id 
+         * @param {boolean} isActive 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateUserStatus(id: number, isActive: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseUserResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateUserStatus(id, isActive, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminUserControllerApi.updateUserStatus']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * AdminUserControllerApi - factory interface
+ */
+export const AdminUserControllerApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = AdminUserControllerApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteUser(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.deleteUser(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserById(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseUserResponse> {
+            return localVarFp.getUserById(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {Pageable} pageable 
+         * @param {string} [keyword] 
+         * @param {GetUsersRoleEnum} [role] 
+         * @param {boolean} [isActive] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUsers(pageable: Pageable, keyword?: string, role?: GetUsersRoleEnum, isActive?: boolean, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageUserResponse> {
+            return localVarFp.getUsers(pageable, keyword, role, isActive, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number} id 
+         * @param {boolean} isActive 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateUserStatus(id: number, isActive: boolean, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseUserResponse> {
+            return localVarFp.updateUserStatus(id, isActive, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * AdminUserControllerApi - object-oriented interface
+ */
+export class AdminUserControllerApi extends BaseAPI {
+    /**
+     * 
+     * @param {number} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public deleteUser(id: number, options?: RawAxiosRequestConfig) {
+        return AdminUserControllerApiFp(this.configuration).deleteUser(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getUserById(id: number, options?: RawAxiosRequestConfig) {
+        return AdminUserControllerApiFp(this.configuration).getUserById(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {Pageable} pageable 
+     * @param {string} [keyword] 
+     * @param {GetUsersRoleEnum} [role] 
+     * @param {boolean} [isActive] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getUsers(pageable: Pageable, keyword?: string, role?: GetUsersRoleEnum, isActive?: boolean, options?: RawAxiosRequestConfig) {
+        return AdminUserControllerApiFp(this.configuration).getUsers(pageable, keyword, role, isActive, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number} id 
+     * @param {boolean} isActive 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public updateUserStatus(id: number, isActive: boolean, options?: RawAxiosRequestConfig) {
+        return AdminUserControllerApiFp(this.configuration).updateUserStatus(id, isActive, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+export const GetUsersRoleEnum = {
+    Admin: 'ADMIN',
+    Customer: 'CUSTOMER',
+    Staff: 'STAFF',
+} as const;
+export type GetUsersRoleEnum = typeof GetUsersRoleEnum[keyof typeof GetUsersRoleEnum];
 
 
 /**
@@ -4389,6 +4801,286 @@ export class GhnAddressControllerApi extends BaseAPI {
      */
     public getWards(districtId: number, options?: RawAxiosRequestConfig) {
         return GhnAddressControllerApiFp(this.configuration).getWards(districtId, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * NotificationControllerApi - axios parameter creator
+ */
+export const NotificationControllerApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {Pageable} pageable 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMyNotifications: async (pageable: Pageable, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'pageable' is not null or undefined
+            assertParamExists('getMyNotifications', 'pageable', pageable)
+            const localVarPath = `/api/notifications`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (pageable !== undefined) {
+                for (const [key, value] of Object.entries(pageable)) {
+                    localVarQueryParameter[key] = value;
+                }
+            }
+
+            localVarHeaderParameter['Accept'] = '*/*';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUnreadCount: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/notifications/unread-count`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = '*/*';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        markAllAsRead: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/notifications/read-all`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = '*/*';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        markAsRead: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('markAsRead', 'id', id)
+            const localVarPath = `/api/notifications/{id}/read`
+                .replace('{id}', encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = '*/*';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * NotificationControllerApi - functional programming interface
+ */
+export const NotificationControllerApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = NotificationControllerApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {Pageable} pageable 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getMyNotifications(pageable: Pageable, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageNotificationResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getMyNotifications(pageable, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['NotificationControllerApi.getMyNotifications']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getUnreadCount(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseUnreadCountResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getUnreadCount(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['NotificationControllerApi.getUnreadCount']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async markAllAsRead(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.markAllAsRead(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['NotificationControllerApi.markAllAsRead']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async markAsRead(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseNotificationResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.markAsRead(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['NotificationControllerApi.markAsRead']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * NotificationControllerApi - factory interface
+ */
+export const NotificationControllerApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = NotificationControllerApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {Pageable} pageable 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMyNotifications(pageable: Pageable, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageNotificationResponse> {
+            return localVarFp.getMyNotifications(pageable, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUnreadCount(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseUnreadCountResponse> {
+            return localVarFp.getUnreadCount(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        markAllAsRead(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.markAllAsRead(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        markAsRead(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseNotificationResponse> {
+            return localVarFp.markAsRead(id, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * NotificationControllerApi - object-oriented interface
+ */
+export class NotificationControllerApi extends BaseAPI {
+    /**
+     * 
+     * @param {Pageable} pageable 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getMyNotifications(pageable: Pageable, options?: RawAxiosRequestConfig) {
+        return NotificationControllerApiFp(this.configuration).getMyNotifications(pageable, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getUnreadCount(options?: RawAxiosRequestConfig) {
+        return NotificationControllerApiFp(this.configuration).getUnreadCount(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public markAllAsRead(options?: RawAxiosRequestConfig) {
+        return NotificationControllerApiFp(this.configuration).markAllAsRead(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public markAsRead(id: number, options?: RawAxiosRequestConfig) {
+        return NotificationControllerApiFp(this.configuration).markAsRead(id, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

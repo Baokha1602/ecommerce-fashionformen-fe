@@ -1,6 +1,5 @@
 .gitignore
 .npmignore
-.openapi-generator-ignore
 api.ts
 base.ts
 common.ts
@@ -8,6 +7,7 @@ configuration.ts
 docs/AdminCouponControllerApi.md
 docs/AdminOrderControllerApi.md
 docs/AdminPromotionControllerApi.md
+docs/AdminUserControllerApi.md
 docs/ApiResponseAuthResponse.md
 docs/ApiResponseBannerResponse.md
 docs/ApiResponseBrandResponse.md
@@ -29,12 +29,15 @@ docs/ApiResponseListRankResponse.md
 docs/ApiResponseListTagResponse.md
 docs/ApiResponseListUserAddressResponse.md
 docs/ApiResponseMapStringString.md
+docs/ApiResponseNotificationResponse.md
 docs/ApiResponseObject.md
 docs/ApiResponseOrderAdminResponse.md
 docs/ApiResponseOrderResponse.md
 docs/ApiResponseOrderStatsResponse.md
 docs/ApiResponseOtpResponse.md
+docs/ApiResponsePageNotificationResponse.md
 docs/ApiResponsePageOrderResponse.md
+docs/ApiResponsePageUserResponse.md
 docs/ApiResponsePaymentUrlResponse.md
 docs/ApiResponseProductImagesResponse.md
 docs/ApiResponseProductResponse.md
@@ -44,7 +47,9 @@ docs/ApiResponseProductVariantResponse.md
 docs/ApiResponsePromotionResponse.md
 docs/ApiResponseRankResponse.md
 docs/ApiResponseTagResponse.md
+docs/ApiResponseUnreadCountResponse.md
 docs/ApiResponseUserAddressResponse.md
+docs/ApiResponseUserResponse.md
 docs/ApiResponseVoid.md
 docs/AuthControllerApi.md
 docs/AuthResponse.md
@@ -67,6 +72,8 @@ docs/CouponResponse.md
 docs/CouponUpdateRequest.md
 docs/CouponUsageHistoryResponse.md
 docs/GhnAddressControllerApi.md
+docs/NotificationControllerApi.md
+docs/NotificationResponse.md
 docs/OrderAdminResponse.md
 docs/OrderControllerApi.md
 docs/OrderCreateRequest.md
@@ -79,7 +86,9 @@ docs/OtpControllerApi.md
 docs/OtpResponse.md
 docs/OtpSendRequest.md
 docs/OtpVerifyRequest.md
+docs/PageNotificationResponse.md
 docs/PageOrderResponse.md
+docs/PageUserResponse.md
 docs/Pageable.md
 docs/PageableObject.md
 docs/PaymentControllerApi.md
@@ -113,6 +122,7 @@ docs/TagControllerApi.md
 docs/TagCreateRequest.md
 docs/TagResponse.md
 docs/TagUpdateRequest.md
+docs/UnreadCountResponse.md
 docs/UserAddressControllerApi.md
 docs/UserAddressCreateRequest.md
 docs/UserAddressResponse.md

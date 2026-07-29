@@ -12,10 +12,7 @@ export const otpApi = createApi({
   reducerPath: 'otpApi',
   baseQuery: axiosBaseQuery(),
   endpoints: (builder) => ({
-    /**
-     * Bước 1: Gửi OTP về email
-     * POST /api/auth/otp/send
-     */
+  
     sendOtp: builder.mutation<ApiResponseVoid, OtpSendRequest>({
       query: (body) => ({
         url: '/api/auth/otp/send',
@@ -24,10 +21,7 @@ export const otpApi = createApi({
       }),
     }),
 
-    /**
-     * Bước 2: Xác minh OTP
-     * POST /api/auth/otp/verify
-     */
+   
     verifyOtp: builder.mutation<ApiResponseOtpResponse, OtpVerifyRequest>({
       query: (body) => ({
         url: '/api/auth/otp/verify',
@@ -36,10 +30,7 @@ export const otpApi = createApi({
       }),
     }),
 
-    /**
-     * Bước 3: Đặt lại mật khẩu
-     * POST /api/auth/otp/reset-password
-     */
+    
     resetPassword: builder.mutation<ApiResponseVoid, ResetPasswordRequest>({
       query: (body) => ({
         url: '/api/auth/otp/reset-password',

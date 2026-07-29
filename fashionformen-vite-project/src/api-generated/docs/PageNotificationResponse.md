@@ -1,4 +1,4 @@
-# PageOrderResponse
+# PageNotificationResponse
 
 
 ## Properties
@@ -8,7 +8,7 @@ Name | Type | Description | Notes
 **totalElements** | **number** |  | [optional] [default to undefined]
 **totalPages** | **number** |  | [optional] [default to undefined]
 **size** | **number** |  | [optional] [default to undefined]
-**content** | [**Array&lt;OrderResponse&gt;**](OrderResponse.md) |  | [optional] [default to undefined]
+**content** | [**Array&lt;NotificationResponse&gt;**](NotificationResponse.md) |  | [optional] [default to undefined]
 **number** | **number** |  | [optional] [default to undefined]
 **sort** | [**SortObject**](SortObject.md) |  | [optional] [default to undefined]
 **first** | **boolean** |  | [optional] [default to undefined]
@@ -20,9 +20,9 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { PageOrderResponse } from './api';
+import { PageNotificationResponse } from './api';
 
-const instance: PageOrderResponse = {
+const instance: PageNotificationResponse = {
     totalElements,
     totalPages,
     size,
