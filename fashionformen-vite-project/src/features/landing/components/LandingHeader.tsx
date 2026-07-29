@@ -17,6 +17,7 @@ import { useAppDispatch, useAppSelector } from '@/app/redux/hooks';
 import { logout } from '@/features/auth/store/auth-slice';
 import logo from '@/assets/images/logo fashion for men.png';
 import { ensureArray } from '@/shared/lib/ensure-array';
+import UserAddressModal from '@/features/user_address/components/UserAddressModal';
 
 interface LandingHeaderProps {
   onCartClick?: () => void;
@@ -32,10 +33,19 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({ onCartClick }) => 
 
   const [megaOpen, setMegaOpen] = useState(false);
   const [brandOpen, setBrandOpen] = useState(false);
+  const [addressModalOpen, setAddressModalOpen] = useState(false);
 
   const handleLogout = () => {
     dispatch(logout());
     navigate('/');
+  };
+
+  const handleOpenAddressModal = () => {
+    if (user) {
+      setAddressModalOpen(true);
+    } else {
+      navigate('/auth/login');
+    }
   };
 
   const userRole = (user?.role || user?.userRole)?.toUpperCase();
@@ -66,6 +76,12 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({ onCartClick }) => 
             icon: <ShoppingCartOutlined />,
             label: 'Đơn hàng của tôi',
             onClick: () => navigate('/account/orders'),
+          },
+          {
+            key: 'addresses',
+            icon: <EnvironmentOutlined />,
+            label: 'Sổ địa chỉ giao hàng',
+            onClick: handleOpenAddressModal,
           },
         ]),
     {
@@ -218,114 +234,123 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({ onCartClick }) => 
   );
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 px-6 py-3.5 flex items-center justify-between shadow-xs">
-      {/* CHỈ DÙNG LOGO ẢNH GỐC CỦA BẠN (Dòng gốc, không chèn thêm logo lạ hay chữ ICONMEN) */}
-      <div
-        className="flex items-center cursor-pointer group"
-        onClick={() => navigate('/')}
-        title="Trang chủ Fashion For Men"
-      >
-        <img
-          src={logo}
-          alt="Yoedu Logo"
-          className="h-10 w-auto object-contain transition-transform group-hover:scale-105"
-        />
-      </div>
-
-      {/* NAVIGATION MENU VỚI DANH MỤC VÀ THƯƠNG HIỆU THẬT */}
-      <nav className="hidden md:flex items-center gap-7 text-xs font-bold tracking-wider uppercase text-slate-800">
-        {/* SẢN PHẨM DROPDOWN DANH MỤC THẬT */}
-        <Popover
-          content={megaMenuContent}
-          trigger="hover"
-          placement="bottom"
-          open={megaOpen}
-          onOpenChange={setMegaOpen}
-          overlayInnerStyle={{ padding: 0 }}
+    <>
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 px-6 py-3.5 flex items-center justify-between shadow-xs">
+        {/* LOGO ẢNH GỐC (Bấm chuyển về trang chủ) */}
+        <div
+          className="flex items-center cursor-pointer group"
+          onClick={() => navigate('/')}
+          title="Trang chủ Fashion For Men"
         >
-          <button className="flex items-center gap-1 hover:text-[#c5a880] transition-colors cursor-pointer py-1 border-b-2 border-transparent hover:border-[#c5a880]">
-            Sản phẩm <DownOutlined className="text-[10px]" />
-          </button>
-        </Popover>
-
-        {/* HÀNG MỚI WITH BADGE */}
-        <Link to="/shop?sort=newest" className="relative hover:text-[#c5a880] transition-colors py-1">
-          Hàng Mới
-          <span className="absolute -top-2.5 -right-5 bg-red-500 text-[9px] text-white font-extrabold px-1 py-0.2 rounded uppercase scale-90 animate-pulse">
-            New
-          </span>
-        </Link>
-
-        {/* HÀNG BÁN CHẠY */}
-        <Link to="/shop?sort=bestseller" className="hover:text-[#c5a880] transition-colors py-1">
-          Hàng Bán Chạy
-        </Link>
-
-        {/* THƯƠNG HIỆU DROPDOWN THẬT */}
-        <Popover
-          content={brandMenuContent}
-          trigger="hover"
-          placement="bottom"
-          open={brandOpen}
-          onOpenChange={setBrandOpen}
-          overlayInnerStyle={{ padding: 0 }}
-        >
-          <button className="flex items-center gap-1 hover:text-[#c5a880] transition-colors cursor-pointer py-1">
-            Thương hiệu <DownOutlined className="text-[10px]" />
-          </button>
-        </Popover>
-
-        {/* OUTLET - HÀNG GIẢM GIÁ NỔI BẬT */}
-        <Link
-          to="/shop?onSale=true"
-          className="text-red-600 hover:text-red-500 font-extrabold tracking-widest transition-all hover:scale-105 py-1"
-        >
-          OUTLET
-        </Link>
-
-        {/* COLLECTION */}
-        <Link to="/shop" className="hover:text-[#c5a880] transition-colors py-1">
-          Collection
-        </Link>
-      </nav>
-
-      {/* RIGHT ACTIONS */}
-      <div className="flex items-center gap-5">
-        <SearchOutlined
-          className="text-lg cursor-pointer hover:text-[#c5a880] transition-colors"
-          onClick={() => navigate('/shop')}
-        />
-        <EnvironmentOutlined
-          className="text-lg cursor-pointer hover:text-[#c5a880] transition-colors"
-          title="Hệ thống cửa hàng"
-        />
-        <Badge count={0} size="small" showZero={false}>
-          <ShoppingCartOutlined
-            className="text-lg cursor-pointer hover:text-[#c5a880] transition-colors"
-            onClick={onCartClick}
+          <img
+            src={logo}
+            alt="Yoedu Logo"
+            className="h-10 w-auto object-contain transition-transform group-hover:scale-105"
           />
-        </Badge>
+        </div>
 
-        {user ? (
-          <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
-            <div className="flex items-center gap-2 cursor-pointer border border-gray-200 px-3 py-1.5 rounded-full hover:border-[#c5a880] transition-all bg-slate-50">
-              <UserOutlined className="text-slate-600" />
-              <span className="text-xs font-semibold text-slate-700 hidden sm:inline">
-                {user.fullName || user.email}
-              </span>
-            </div>
-          </Dropdown>
-        ) : (
-          <Button
-            type="primary"
-            onClick={() => navigate('/auth/login')}
-            className="h-9 px-5 bg-black hover:bg-[#c5a880] border-none text-white font-bold text-xs uppercase tracking-widest rounded-full transition-all hover:scale-105 shadow-md"
+        {/* NAVIGATION MENU VỚI DANH MỤC VÀ THƯƠNG HIỆU THẬT */}
+        <nav className="hidden md:flex items-center gap-7 text-xs font-bold tracking-wider uppercase text-slate-800">
+          {/* SẢN PHẨM DROPDOWN DANH MỤC THẬT */}
+          <Popover
+            content={megaMenuContent}
+            trigger="hover"
+            placement="bottom"
+            open={megaOpen}
+            onOpenChange={setMegaOpen}
+            styles={{ container: { padding: 0 } }}
           >
-            Đăng Nhập
-          </Button>
-        )}
-      </div>
-    </header>
+            <button className="flex items-center gap-1 hover:text-[#c5a880] transition-colors cursor-pointer py-1 border-b-2 border-transparent hover:border-[#c5a880]">
+              Sản phẩm <DownOutlined className="text-[10px]" />
+            </button>
+          </Popover>
+
+          {/* HÀNG MỚI WITH BADGE */}
+          <Link to="/shop?sort=newest" className="relative hover:text-[#c5a880] transition-colors py-1">
+            Hàng Mới
+            <span className="absolute -top-2.5 -right-5 bg-red-500 text-[9px] text-white font-extrabold px-1 py-0.2 rounded uppercase scale-90 animate-pulse">
+              New
+            </span>
+          </Link>
+
+          {/* HÀNG BÁN CHẠY */}
+          <Link to="/shop?sort=bestseller" className="hover:text-[#c5a880] transition-colors py-1">
+            Hàng Bán Chạy
+          </Link>
+
+          {/* THƯƠNG HIỆU DROPDOWN THẬT */}
+          <Popover
+            content={brandMenuContent}
+            trigger="hover"
+            placement="bottom"
+            open={brandOpen}
+            onOpenChange={setBrandOpen}
+            styles={{ container: { padding: 0 } }}
+          >
+            <button className="flex items-center gap-1 hover:text-[#c5a880] transition-colors cursor-pointer py-1">
+              Thương hiệu <DownOutlined className="text-[10px]" />
+            </button>
+          </Popover>
+
+          {/* OUTLET - HÀNG GIẢM GIÁ NỔI BẬT */}
+          <Link
+            to="/shop?onSale=true"
+            className="text-red-600 hover:text-red-500 font-extrabold tracking-widest transition-all hover:scale-105 py-1"
+          >
+            OUTLET
+          </Link>
+
+          {/* COLLECTION */}
+          <Link to="/shop" className="hover:text-[#c5a880] transition-colors py-1">
+            Collection
+          </Link>
+        </nav>
+
+        {/* RIGHT ACTIONS */}
+        <div className="flex items-center gap-5">
+          <SearchOutlined
+            className="text-lg cursor-pointer hover:text-[#c5a880] transition-colors"
+            onClick={() => navigate('/shop')}
+          />
+          <EnvironmentOutlined
+            className="text-lg cursor-pointer hover:text-[#c5a880] transition-colors"
+            title="Sổ địa chỉ giao hàng của tôi"
+            onClick={handleOpenAddressModal}
+          />
+          <Badge count={0} size="small" showZero={false}>
+            <ShoppingCartOutlined
+              className="text-lg cursor-pointer hover:text-[#c5a880] transition-colors"
+              onClick={onCartClick}
+            />
+          </Badge>
+
+          {user ? (
+            <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
+              <div className="flex items-center gap-2 cursor-pointer border border-gray-200 px-3 py-1.5 rounded-full hover:border-[#c5a880] transition-all bg-slate-50">
+                <UserOutlined className="text-slate-600" />
+                <span className="text-xs font-semibold text-slate-700 hidden sm:inline">
+                  {user.fullName || user.email}
+                </span>
+              </div>
+            </Dropdown>
+          ) : (
+            <Button
+              type="primary"
+              onClick={() => navigate('/auth/login')}
+              className="h-9 px-5 bg-black hover:bg-[#c5a880] border-none text-white font-bold text-xs uppercase tracking-widest rounded-full transition-all hover:scale-105 shadow-md"
+            >
+              Đăng Nhập
+            </Button>
+          )}
+        </div>
+      </header>
+
+      {/* Modal quản lý & tạo địa chỉ giao hàng cho khách hàng */}
+      <UserAddressModal
+        open={addressModalOpen}
+        onClose={() => setAddressModalOpen(false)}
+      />
+    </>
   );
 };
 

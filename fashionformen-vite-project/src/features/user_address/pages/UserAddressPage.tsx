@@ -18,12 +18,20 @@ const { Title, Text } = Typography;
 
 const UserAddressPage: React.FC = () => {
   const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state) => state.auth);
   const { list, loading, submitting, error } = useAppSelector((state) => state.userAddress);
   const { message, modal } = App.useApp();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<UserAddressResponse | null>(null);
   const [searchUserId, setSearchUserId] = useState<string>('');
+
+  useEffect(() => {
+    if (user?.id) {
+      dispatch(fetchUserAddressesByUserIdThunk(user.id));
+      setSearchUserId(user.id.toString());
+    }
+  }, [dispatch, user?.id]);
 
   useEffect(() => {
     if (error) { message.error(error); dispatch(clearError()); }
@@ -47,7 +55,11 @@ const UserAddressPage: React.FC = () => {
       const result = await dispatch(updateUserAddressThunk({ id: editing.id, body: values as UserAddressUpdateRequest }));
       if (updateUserAddressThunk.fulfilled.match(result)) { message.success('Cập nhật địa chỉ thành công!'); handleCloseModal(); }
     } else {
-      const result = await dispatch(createUserAddressThunk(values as UserAddressCreateRequest));
+      const createPayload: UserAddressCreateRequest = {
+        ...(values as UserAddressCreateRequest),
+        userId: user?.id || parseInt(searchUserId) || 1,
+      };
+      const result = await dispatch(createUserAddressThunk(createPayload));
       if (createUserAddressThunk.fulfilled.match(result)) { message.success('Tạo địa chỉ thành công!'); handleCloseModal(); }
     }
   };

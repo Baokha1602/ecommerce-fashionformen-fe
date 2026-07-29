@@ -60,7 +60,7 @@ export const router = createBrowserRouter([
           { path: '/account', element: <PageStub name="Tài khoản của tôi" /> },
           { path: '/account/orders', element: <PageStub name="Lịch sử đơn hàng" /> },
           { path: '/account/profile', element: <PageStub name="Hồ sơ cá nhân" /> },
-          { path: '/account/addresses', element: <PageStub name="Sổ địa chỉ" /> },
+          { path: '/account/addresses', element: <UserAddressPage /> },
         ],
       },
     ],

@@ -119,7 +119,7 @@ export const AdminNotificationDrawer: React.FC<AdminNotificationDrawerProps> = (
       placement="right"
       onClose={onClose}
       open={open}
-      width={400}
+      styles={{ wrapper: { width: 400 } }}
     >
       {loading ? (
         <div className="flex justify-center items-center h-64">
