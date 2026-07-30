@@ -607,9 +607,9 @@ export interface PageNotificationResponse {
     'content'?: Array<NotificationResponse>;
     'number'?: number;
     'sort'?: SortObject;
+    'numberOfElements'?: number;
     'first'?: boolean;
     'last'?: boolean;
-    'numberOfElements'?: number;
     'pageable'?: PageableObject;
     'empty'?: boolean;
 }
@@ -620,9 +620,9 @@ export interface PageOrderResponse {
     'content'?: Array<OrderResponse>;
     'number'?: number;
     'sort'?: SortObject;
+    'numberOfElements'?: number;
     'first'?: boolean;
     'last'?: boolean;
-    'numberOfElements'?: number;
     'pageable'?: PageableObject;
     'empty'?: boolean;
 }
@@ -633,9 +633,9 @@ export interface PageUserResponse {
     'content'?: Array<UserResponse>;
     'number'?: number;
     'sort'?: SortObject;
+    'numberOfElements'?: number;
     'first'?: boolean;
     'last'?: boolean;
-    'numberOfElements'?: number;
     'pageable'?: PageableObject;
     'empty'?: boolean;
 }
@@ -645,12 +645,12 @@ export interface Pageable {
     'sort'?: Array<string>;
 }
 export interface PageableObject {
+    'unpaged'?: boolean;
     'offset'?: number;
     'sort'?: SortObject;
-    'unpaged'?: boolean;
+    'paged'?: boolean;
     'pageNumber'?: number;
     'pageSize'?: number;
-    'paged'?: boolean;
 }
 export interface PaymentUrlResponse {
     'orderId'?: number;
@@ -817,8 +817,8 @@ export interface ResetPasswordRequest {
 }
 export interface SortObject {
     'empty'?: boolean;
-    'unsorted'?: boolean;
     'sorted'?: boolean;
+    'unsorted'?: boolean;
 }
 export interface TagCreateRequest {
     'name': string;

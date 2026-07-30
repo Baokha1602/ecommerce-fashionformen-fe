@@ -67,7 +67,7 @@ const NAV_ENTRIES: NavEntry[] = [
   { type: 'divider', key: 'd-customers', label: 'Khách hàng', roles: ['ADMIN'] },
   { key: '/admin/customers',            icon: <TeamOutlined />,        label: 'Quản lý Khách hàng',      roles: ['ADMIN'] },
   { key: '/admin/customers/ranks',      icon: <CrownOutlined />,       label: 'Quản lý Hạng thành viên', roles: ['ADMIN'] },
-  { key: '/admin/customers/addresses',  icon: <EnvironmentOutlined />, label: 'Sổ địa chỉ',              roles: ['ADMIN'] },
+  { key: '/admin/customers/addresses',  icon: <EnvironmentOutlined />, label: 'Quản lý Địa chỉ khách', roles: ['ADMIN'] },
 
   { type: 'divider', key: 'd-hr', label: 'Nhân sự', roles: ['ADMIN'] },
   { key: '/admin/staff', icon: <UserSwitchOutlined />, label: 'Quản lý Nhân viên', roles: ['ADMIN'] },

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, App, Typography, Space } from 'antd';
+import { Table, Button, App, Typography, Space, Input } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { PlusOutlined, EditOutlined, DeleteOutlined, TagsOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, TagsOutlined, SearchOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@/app/redux/hooks';
 import {
   fetchAllTagsThunk, createTagThunk, updateTagThunk, deleteTagThunk,
@@ -9,6 +9,7 @@ import {
 import { clearError } from '../store/tags-slice';
 import { TagFormModal } from '../components/TagFormModal';
 import type { TagResponse, TagCreateRequest, TagUpdateRequest } from '../types/tags-type';
+import { useMemo } from 'react';
 
 const { Title, Text } = Typography;
 
@@ -19,12 +20,23 @@ const TagsPage: React.FC = () => {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<TagResponse | null>(null);
+  const [searchText, setSearchText] = useState('');
 
   useEffect(() => { dispatch(fetchAllTagsThunk()); }, [dispatch]);
 
   useEffect(() => {
     if (error) { message.error(error); dispatch(clearError()); }
   }, [error, message, dispatch]);
+
+  // Lọc danh sách tag theo search
+  const filteredList = useMemo(() => {
+    if (!searchText.trim()) return list;
+    const q = searchText.toLowerCase();
+    return list.filter((t) =>
+      (t.name || '').toLowerCase().includes(q) ||
+      (t.description || '').toLowerCase().includes(q)
+    );
+  }, [list, searchText]);
 
   const handleOpenCreate = () => { setEditing(null); setModalOpen(true); };
   const handleOpenEdit = (record: TagResponse) => { setEditing(record); setModalOpen(true); };
@@ -46,23 +58,41 @@ const TagsPage: React.FC = () => {
     }
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (record: TagResponse) => {
     modal.confirm({
-      title: 'Xác nhận xóa',
-      content: 'Bạn có chắc muốn xóa tag này không?',
-      okText: 'Xóa', okButtonProps: { danger: true }, cancelText: 'Hủy',
+      title: 'Xác nhận xóa tag',
+      content: (
+        <div>
+          <p>
+            Bạn có chắc muốn xóa tag{' '}
+            <strong
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                padding: '2px 10px', borderRadius: 16,
+                background: '#c5a88018', border: '1.5px solid #c5a880',
+                color: '#c5a880', fontWeight: 700,
+              }}
+            >
+              <TagsOutlined style={{ fontSize: 10 }} /> {record.name}
+            </strong>
+            ?
+          </p>
+          <p style={{ color: '#ff4d4f', fontSize: 12, marginTop: 4 }}>
+            ⚠️ Tag sẽ bị xóa vĩnh viễn và không thể khôi phục!
+          </p>
+        </div>
+      ),
+      okText: 'Xóa vĩnh viễn',
+      okButtonProps: { danger: true },
+      cancelText: 'Hủy',
       onOk: async () => {
-        const result = await dispatch(deleteTagThunk(id));
-        if (deleteTagThunk.fulfilled.match(result)) message.success('Xóa tag thành công!');
+        const result = await dispatch(deleteTagThunk(record.id!));
+        if (deleteTagThunk.fulfilled.match(result)) message.success('Đã xóa tag thành công!');
       },
     });
   };
 
   const columns: ColumnsType<TagResponse> = [
-    {
-      title: 'ID', dataIndex: 'id', width: 60, align: 'center',
-      render: (v: number) => <Text type="secondary" className="text-xs font-mono">#{v}</Text>,
-    },
     {
       title: 'Tên tag', dataIndex: 'name',
       render: (name: string) => (
@@ -91,7 +121,7 @@ const TagsPage: React.FC = () => {
       render: (_: unknown, record: TagResponse) => (
         <Space size={4}>
           <Button type="text" size="small" icon={<EditOutlined />} onClick={() => handleOpenEdit(record)} style={{ color: '#c5a880' }} title="Chỉnh sửa" />
-          <Button type="text" size="small" danger icon={<DeleteOutlined />} onClick={() => handleDelete(record.id!)} title="Xóa" />
+          <Button type="text" size="small" danger icon={<DeleteOutlined />} onClick={() => handleDelete(record)} title="Xóa" />
         </Space>
       ),
     },
@@ -111,7 +141,7 @@ const TagsPage: React.FC = () => {
           </div>
           <div>
             <Title level={5} style={{ margin: 0, fontWeight: 700, color: '#1a1a1a' }}>Tags sản phẩm</Title>
-            <Text type="secondary" style={{ fontSize: 12 }}>Quản lý danh sách nhãn / tag sản phẩm</Text>
+            <Text type="secondary" style={{ fontSize: 12 }}>Quản lý danh sách nhãn / tag sản phẩm ({list.length} tags)</Text>
           </div>
         </div>
         <Button
@@ -126,10 +156,22 @@ const TagsPage: React.FC = () => {
         </Button>
       </div>
 
+      {/* Search bar */}
+      <div style={{ marginBottom: 16 }}>
+        <Input
+          allowClear
+          placeholder="Tìm kiếm tag theo tên hoặc mô tả..."
+          prefix={<SearchOutlined style={{ color: '#c5a880' }} />}
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          style={{ maxWidth: 320, borderRadius: 8 }}
+        />
+      </div>
+
       <Table
-        rowKey="id" columns={columns} dataSource={Array.isArray(list) ? list : []} loading={loading}
+        rowKey="id" columns={columns} dataSource={filteredList} loading={loading}
         size="middle" bordered={false}
-        pagination={Array.isArray(list) && list.length > 10 ? { pageSize: 10, showSizeChanger: false, position: ['bottomRight'] } : false}
+        pagination={filteredList.length > 10 ? { pageSize: 10, showSizeChanger: false, position: ['bottomRight'] } : false}
         style={{ background: '#fff', borderRadius: 12, boxShadow: '0 1px 6px rgba(0,0,0,0.06)', overflow: 'hidden' }}
         rowClassName="hover:bg-[#fafafa] transition-colors"
       />

@@ -1,19 +1,29 @@
-import React, { useEffect } from 'react';
-import { Table, App, Typography, Avatar } from 'antd';
+import React, { useEffect, useState, useMemo } from 'react';
+import { Table, Button, App, Typography, Avatar, Space, Input, Popconfirm, Tooltip } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { UserOutlined } from '@ant-design/icons';
+import { UserOutlined, EditOutlined, DeleteOutlined, CheckCircleOutlined, StopOutlined, SearchOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@/app/redux/hooks';
-import { fetchAllUsersThunk } from '../store/users-thunk';
+import {
+  fetchAllUsersThunk,
+  updateUserThunk,
+  toggleActiveUserThunk,
+  deleteUserThunk,
+} from '../store/users-thunk';
 import { clearError } from '../store/users-slice';
 import { USER_ROLE_LABEL, USER_ROLE_COLOR } from '../constants/users-constants';
-import type { UserResponse } from '../types/users-type';
+import type { UserResponse, UserUpdateRequest } from '../types/users-type';
+import { UserFormModal } from '../components/UserFormModal';
 
 const { Title, Text } = Typography;
 
 const UsersPage: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { list, loading, error } = useAppSelector((state) => state.users);
-  const { message } = App.useApp();
+  const { list, loading, submitting, error } = useAppSelector((state) => state.users);
+  const { message, modal } = App.useApp();
+
+  const [searchText, setSearchText] = useState('');
+  const [editingUser, setEditingUser] = useState<UserResponse | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchAllUsersThunk());
@@ -26,16 +36,67 @@ const UsersPage: React.FC = () => {
     }
   }, [error, message, dispatch]);
 
+  // Lọc danh sách theo search text
+  const filteredList = useMemo(() => {
+    if (!searchText.trim()) return list;
+    const q = searchText.toLowerCase();
+    return list.filter((u) =>
+      (u.fullName || '').toLowerCase().includes(q) ||
+      (u.username || '').toLowerCase().includes(q) ||
+      (u.email || '').toLowerCase().includes(q) ||
+      (u.phone || '').toLowerCase().includes(q)
+    );
+  }, [list, searchText]);
+
+  const handleOpenEdit = (user: UserResponse) => {
+    setEditingUser(user);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setEditingUser(null);
+  };
+
+  const handleSubmitEdit = async (values: UserUpdateRequest) => {
+    if (!editingUser?.id) return;
+    const result = await dispatch(updateUserThunk({ id: editingUser.id, data: values }));
+    if (updateUserThunk.fulfilled.match(result)) {
+      message.success('Cập nhật thông tin thành công!');
+      handleCloseModal();
+    }
+  };
+
+  const handleToggleActive = async (user: UserResponse) => {
+    const newStatus = !user.isActive;
+    const result = await dispatch(toggleActiveUserThunk({ id: user.id!, isActive: newStatus }));
+    if (toggleActiveUserThunk.fulfilled.match(result)) {
+      message.success(newStatus ? 'Đã kích hoạt tài khoản!' : 'Đã vô hiệu hóa tài khoản!');
+    }
+  };
+
+  const handleDelete = (user: UserResponse) => {
+    modal.confirm({
+      title: 'Xác nhận xóa khách hàng',
+      content: (
+        <div>
+          <p>Bạn có chắc muốn xóa khách hàng <strong>{user.fullName || user.username}</strong>?</p>
+          <p style={{ color: '#ff4d4f', fontSize: 12 }}>Hành động này không thể hoàn tác!</p>
+        </div>
+      ),
+      okText: 'Xóa', okButtonProps: { danger: true }, cancelText: 'Hủy',
+      onOk: async () => {
+        const result = await dispatch(deleteUserThunk(user.id!));
+        if (deleteUserThunk.fulfilled.match(result)) {
+          message.success('Xóa khách hàng thành công!');
+        }
+      },
+    });
+  };
+
   const columns: ColumnsType<UserResponse> = [
     {
-      title: 'ID',
-      dataIndex: 'id',
-      width: 60,
-      align: 'center',
-      render: (v: number) => <Text type="secondary" className="text-xs font-mono">#{v}</Text>,
-    },
-    {
-      title: 'Người dùng',
+      title: 'Khách hàng',
       render: (_: unknown, record: UserResponse) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {record.avatarUrl ? (
@@ -139,9 +200,56 @@ const UsersPage: React.FC = () => {
     {
       title: 'Ngày tạo',
       dataIndex: 'createdAt',
-      width: 120,
+      width: 110,
       render: (v: string) => (
         v ? <Text type="secondary" className="text-xs">{new Date(v).toLocaleDateString('vi-VN')}</Text> : '—'
+      ),
+    },
+    {
+      title: 'Thao tác',
+      align: 'center',
+      width: 130,
+      render: (_: unknown, record: UserResponse) => (
+        <Space size={4}>
+          <Tooltip title="Chỉnh sửa">
+            <Button
+              type="text"
+              size="small"
+              icon={<EditOutlined />}
+              onClick={() => handleOpenEdit(record)}
+              style={{ color: '#c5a880' }}
+            />
+          </Tooltip>
+          <Tooltip title={record.isActive ? 'Vô hiệu hóa' : 'Kích hoạt'}>
+            <Popconfirm
+              title={record.isActive ? 'Vô hiệu hóa tài khoản?' : 'Kích hoạt tài khoản?'}
+              description={record.isActive
+                ? 'Tài khoản sẽ bị khóa và không thể đăng nhập.'
+                : 'Tài khoản sẽ được kích hoạt trở lại.'}
+              onConfirm={() => handleToggleActive(record)}
+              okText="Xác nhận"
+              cancelText="Hủy"
+              okButtonProps={{ danger: record.isActive }}
+            >
+              <Button
+                type="text"
+                size="small"
+                icon={record.isActive ? <StopOutlined /> : <CheckCircleOutlined />}
+                style={{ color: record.isActive ? '#ff4d4f' : '#52c41a' }}
+                loading={submitting}
+              />
+            </Popconfirm>
+          </Tooltip>
+          <Tooltip title="Xóa">
+            <Button
+              type="text"
+              size="small"
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => handleDelete(record)}
+            />
+          </Tooltip>
+        </Space>
       ),
     },
   ];
@@ -170,23 +278,53 @@ const UsersPage: React.FC = () => {
               Quản lý người dùng
             </Title>
             <Text type="secondary" style={{ fontSize: 12 }}>
-              Xem danh sách người dùng và khách hàng
+              {list.length} khách hàng trong hệ thống
             </Text>
           </div>
         </div>
+      </div>
+
+      {/* Search bar */}
+      <div style={{ marginBottom: 16 }}>
+        <Input
+          allowClear
+          placeholder="Tìm kiếm theo tên, email, số điện thoại..."
+          prefix={<SearchOutlined style={{ color: '#c5a880' }} />}
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          style={{ maxWidth: 380, borderRadius: 8 }}
+        />
+        {searchText && (
+          <Text type="secondary" style={{ marginLeft: 12, fontSize: 13 }}>
+            Tìm thấy <strong>{filteredList.length}</strong> kết quả
+          </Text>
+        )}
       </div>
 
       {/* Table */}
       <Table
         rowKey="id"
         columns={columns}
-        dataSource={Array.isArray(list) ? list : []}
+        dataSource={filteredList}
         loading={loading}
         size="middle"
         bordered={false}
-        pagination={Array.isArray(list) && list.length > 10 ? { pageSize: 10, showSizeChanger: false, position: ['bottomRight'] } : false}
+        pagination={
+          filteredList.length > 10
+            ? { pageSize: 10, showSizeChanger: false, position: ['bottomRight'], showTotal: (total) => `Tổng ${total} khách hàng` }
+            : false
+        }
         style={{ background: '#fff', borderRadius: 12, boxShadow: '0 1px 6px rgba(0,0,0,0.06)', overflow: 'hidden' }}
         rowClassName="hover:bg-[#fafafa] transition-colors"
+      />
+
+      {/* Modal sửa */}
+      <UserFormModal
+        open={modalOpen}
+        editing={editingUser}
+        submitting={submitting}
+        onSubmit={handleSubmitEdit}
+        onClose={handleCloseModal}
       />
     </div>
   );
