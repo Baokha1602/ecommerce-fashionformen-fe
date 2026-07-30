@@ -22,6 +22,7 @@ import BrandsPage from '@/features/brands/pages/BrandsPage';
 import TagsPage from '@/features/tags/pages/TagsPage';
 import BannersPage from '@/features/banners/pages/BannersPage';
 import UsersPage from '@/features/users/pages/UsersPage';
+import StaffPage from '@/features/users/pages/StaffPage';
 import UserAddressPage from '@/features/user_address/pages/UserAddressPage';
 
 // ── Page Stub (placeholder cho các trang chưa xây dựng) ───────
@@ -119,7 +120,7 @@ export const router = createBrowserRouter([
               { path: '/admin/customers/addresses', element: <UserAddressPage /> },
 
               // Staff / HR
-              { path: '/admin/staff', element: <PageStub name="Quản lý Nhân viên" /> },
+              { path: '/admin/staff', element: <StaffPage /> },
 
               // Marketing
               { path: '/admin/promotions', element: <PageStub name="Chương trình khuyến mãi" /> },

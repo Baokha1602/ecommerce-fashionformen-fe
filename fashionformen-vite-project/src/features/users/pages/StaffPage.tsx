@@ -16,7 +16,7 @@ import { UserFormModal } from '../components/UserFormModal';
 
 const { Title, Text } = Typography;
 
-const UsersPage: React.FC = () => {
+const StaffPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { list, loading, submitting, error } = useAppSelector((state) => state.users);
   const { message, modal } = App.useApp();
@@ -36,12 +36,17 @@ const UsersPage: React.FC = () => {
     }
   }, [error, message, dispatch]);
 
-  // Lọc danh sách theo vai trò CUSTOMER và search text
+  // Lọc danh sách theo vai trò STAFF, ADMIN và search text
   const filteredList = useMemo(() => {
-    const customersOnly = list.filter((u) => (u.userRole || '').toUpperCase() === 'CUSTOMER');
-    if (!searchText.trim()) return customersOnly;
+    const staffAndAdmins = list.filter(
+      (u) => {
+        const role = (u.userRole || '').toUpperCase();
+        return role === 'STAFF' || role === 'ADMIN';
+      }
+    );
+    if (!searchText.trim()) return staffAndAdmins;
     const q = searchText.toLowerCase();
-    return customersOnly.filter((u) =>
+    return staffAndAdmins.filter((u) =>
       (u.fullName || '').toLowerCase().includes(q) ||
       (u.username || '').toLowerCase().includes(q) ||
       (u.email || '').toLowerCase().includes(q) ||
@@ -78,10 +83,10 @@ const UsersPage: React.FC = () => {
 
   const handleDelete = (user: UserResponse) => {
     modal.confirm({
-      title: 'Xác nhận xóa khách hàng',
+      title: 'Xác nhận xóa tài khoản nhân sự',
       content: (
         <div>
-          <p>Bạn có chắc muốn xóa khách hàng <strong>{user.fullName || user.username}</strong>?</p>
+          <p>Bạn có chắc muốn xóa tài khoản <strong>{user.fullName || user.username}</strong>?</p>
           <p style={{ color: '#ff4d4f', fontSize: 12 }}>Hành động này không thể hoàn tác!</p>
         </div>
       ),
@@ -89,7 +94,7 @@ const UsersPage: React.FC = () => {
       onOk: async () => {
         const result = await dispatch(deleteUserThunk(user.id!));
         if (deleteUserThunk.fulfilled.match(result)) {
-          message.success('Xóa khách hàng thành công!');
+          message.success('Xóa tài khoản thành công!');
         }
       },
     });
@@ -97,7 +102,7 @@ const UsersPage: React.FC = () => {
 
   const columns: ColumnsType<UserResponse> = [
     {
-      title: 'Khách hàng',
+      title: 'Nhân viên / Admin',
       render: (_: unknown, record: UserResponse) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {record.avatarImage ? (
@@ -159,24 +164,9 @@ const UsersPage: React.FC = () => {
       },
     },
     {
-      title: 'Hạng',
-      dataIndex: 'rankName',
-      width: 110,
-      render: (v: string) => (
-        v ? <Text style={{ fontSize: 12, fontWeight: 600, color: '#c5a880' }}>{v}</Text> : <Text type="secondary">—</Text>
-      ),
-    },
-    {
-      title: 'Điểm',
-      dataIndex: 'currentPoint',
-      width: 90,
-      align: 'right',
-      render: (v: number) => <Text strong>{(v ?? 0).toLocaleString('vi-VN')}</Text>,
-    },
-    {
       title: 'Trạng thái',
       dataIndex: 'isActive',
-      width: 110,
+      width: 130,
       align: 'center',
       render: (isActive: boolean) => (
         <span
@@ -223,9 +213,9 @@ const UsersPage: React.FC = () => {
           </Tooltip>
           <Tooltip title={record.isActive ? 'Vô hiệu hóa' : 'Khôi phục'}>
             <Popconfirm
-              title={record.isActive ? 'Vô hiệu hóa tài khoản?' : 'Khôi phục hoạt động?'}
+              title={record.isActive ? 'Vô hiệu hóa tài khoản nhân sự?' : 'Khôi phục hoạt động?'}
               description={record.isActive
-                ? 'Tài khoản này sẽ tạm dừng hoạt động.'
+                ? 'Tài khoản nhân viên này sẽ tạm dừng hoạt động.'
                 : 'Khôi phục trạng thái hoạt động bình thường.'}
               onConfirm={() => handleToggleActive(record)}
               okText={record.isActive ? 'Vô hiệu hóa' : 'Khôi phục'}
@@ -276,10 +266,10 @@ const UsersPage: React.FC = () => {
           </div>
           <div>
             <Title level={5} style={{ margin: 0, fontWeight: 700, color: '#1a1a1a' }}>
-              Quản lý người dùng
+              Quản lý nhân sự (Staff / Admin)
             </Title>
             <Text type="secondary" style={{ fontSize: 12 }}>
-              {list.length} khách hàng trong hệ thống
+              {filteredList.length} nhân viên và quản trị viên trong hệ thống
             </Text>
           </div>
         </div>
@@ -289,7 +279,7 @@ const UsersPage: React.FC = () => {
       <div style={{ marginBottom: 16 }}>
         <Input
           allowClear
-          placeholder="Tìm kiếm theo tên, email, số điện thoại..."
+          placeholder="Tìm kiếm nhân sự..."
           prefix={<SearchOutlined style={{ color: '#c5a880' }} />}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
@@ -312,7 +302,7 @@ const UsersPage: React.FC = () => {
         bordered={false}
         pagination={
           filteredList.length > 10
-            ? { pageSize: 10, showSizeChanger: false, position: ['bottomRight'], showTotal: (total) => `Tổng ${total} khách hàng` }
+            ? { pageSize: 10, showSizeChanger: false, position: ['bottomRight'], showTotal: (total) => `Tổng ${total} nhân sự` }
             : false
         }
         style={{ background: '#fff', borderRadius: 12, boxShadow: '0 1px 6px rgba(0,0,0,0.06)', overflow: 'hidden' }}
@@ -331,4 +321,4 @@ const UsersPage: React.FC = () => {
   );
 };
 
-export default UsersPage;
+export default StaffPage;

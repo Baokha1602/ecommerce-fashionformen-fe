@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
-import { Modal, Form, Input, Button, DatePicker } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Modal, Form, Input, Button, DatePicker, Upload, message } from 'antd';
+import { UploadOutlined, LoadingOutlined } from '@ant-design/icons';
 import type { UserResponse, UserUpdateRequest } from '../types/users-type';
 import dayjs from 'dayjs';
 
@@ -11,10 +12,20 @@ interface UserFormModalProps {
   onClose: () => void;
 }
 
+const getBase64 = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+  });
+
 export const UserFormModal: React.FC<UserFormModalProps> = ({
   open, editing, submitting, onSubmit, onClose,
 }) => {
   const [form] = Form.useForm();
+  const [avatarBase64, setAvatarBase64] = useState<string>('');
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (open && editing) {
@@ -22,11 +33,12 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
         fullName: editing.fullName || '',
         email: editing.email || '',
         phone: editing.phone || '',
-        avatarUrl: editing.avatarUrl || '',
         dateOfBirth: editing.dateOfBirth ? dayjs(editing.dateOfBirth) : null,
       });
+      setAvatarBase64(editing.avatarImage || '');
     } else if (!open) {
       form.resetFields();
+      setAvatarBase64('');
     }
   }, [open, editing, form]);
 
@@ -36,7 +48,7 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
         fullName: values.fullName,
         email: values.email,
         phone: values.phone,
-        avatarUrl: values.avatarUrl,
+        avatarImage: avatarBase64 || undefined,
         dateOfBirth: values.dateOfBirth ? dayjs(values.dateOfBirth).format('YYYY-MM-DD') : undefined,
       };
       onSubmit(payload);
@@ -116,8 +128,53 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
           />
         </Form.Item>
 
-        <Form.Item name="avatarUrl" label="URL ảnh đại diện">
-          <Input placeholder="https://..." />
+        <Form.Item label="Ảnh đại diện">
+          <Upload
+            name="avatar"
+            listType="picture-card"
+            className="avatar-uploader"
+            showUploadList={false}
+            beforeUpload={(file) => {
+              const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/webp';
+              if (!isJpgOrPng) {
+                message.error('Chỉ hỗ trợ file JPG/PNG/WebP!');
+                return Upload.LIST_IGNORE;
+              }
+              const isLt2M = file.size / 1024 / 1024 < 2;
+              if (!isLt2M) {
+                message.error('Ảnh phải nhỏ hơn 2MB!');
+                return Upload.LIST_IGNORE;
+              }
+              setUploading(true);
+              getBase64(file as File)
+                .then((base64) => {
+                  setAvatarBase64(base64);
+                })
+                .catch(() => message.error('Không thể đọc file ảnh.'))
+                .finally(() => setUploading(false));
+              return false; // Ngăn auto upload lên server
+            }}
+          >
+            {avatarBase64 ? (
+              <img src={avatarBase64} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} />
+            ) : (
+              <div>
+                {uploading ? <LoadingOutlined /> : <UploadOutlined />}
+                <div style={{ marginTop: 8 }}>Chọn ảnh</div>
+              </div>
+            )}
+          </Upload>
+          {avatarBase64 && (
+            <Button 
+              type="link" 
+              danger 
+              size="small" 
+              onClick={() => setAvatarBase64('')}
+              style={{ padding: 0, marginTop: 4 }}
+            >
+              Xóa ảnh
+            </Button>
+          )}
         </Form.Item>
       </Form>
     </Modal>
