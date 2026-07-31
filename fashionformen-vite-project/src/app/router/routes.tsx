@@ -8,6 +8,7 @@ import ProtectedRoute from './ProtectedRoute';
 // ── Auth Pages ────────────────────────────────────────────────
 import LoginPage from '@/features/auth/pages/LoginPage';
 import RegisterPage from '@/features/auth/pages/RegisterPage';
+import ForgotPasswordPage from '@/features/auth/pages/ForgotPasswordPage';
 
 // ── Storefront Pages ──────────────────────────────────────────
 import LandingPage from '@/features/landing/pages/LandingPage';
@@ -15,6 +16,14 @@ import ProductDetailPage from '@/features/shop/pages/ProductDetailPage';
 
 // ── Admin Pages ───────────────────────────────────────────────
 import AdminDashboardPage from '@/features/admin/pages/AdminDashboardPage';
+import RanksPage from '@/features/ranks/pages/RanksPage';
+import CategoryPage from '@/features/category/pages/CategoryPage';
+import BrandsPage from '@/features/brands/pages/BrandsPage';
+import TagsPage from '@/features/tags/pages/TagsPage';
+import BannersPage from '@/features/banners/pages/BannersPage';
+import UsersPage from '@/features/users/pages/UsersPage';
+import StaffPage from '@/features/users/pages/StaffPage';
+import UserAddressPage from '@/features/user_address/pages/UserAddressPage';
 
 // ── Page Stub (placeholder cho các trang chưa xây dựng) ───────
 const PageStub = ({ name }: { name: string }) => (
@@ -33,52 +42,27 @@ const PageStub = ({ name }: { name: string }) => (
 export const router = createBrowserRouter([
 
   /***********************************************************
-   * STOREFRONT (Public)
+   * STOREFRONT (Public & Customer Account)
    ***********************************************************/
   {
     element: <StorefrontLayout />,
     children: [
-      // Trang chủ
+      // Public pages
+      { path: '/', element: <LandingPage /> },
+      { path: '/shop', element: <PageStub name="Cửa hàng - Danh sách sản phẩm" /> },
+      { path: '/shop/:slug', element: <ProductDetailPage /> },
+      { path: '/cart', element: <PageStub name="Giỏ hàng" /> },
+      { path: '/checkout', element: <PageStub name="Thanh toán" /> },
+
+      // Customer account routes (Cần đăng nhập)
       {
-        path: '/',
-        element: <LandingPage />,
-      },
-      // Danh sách sản phẩm
-      {
-        path: '/shop',
-        element: <PageStub name="Cửa hàng - Danh sách sản phẩm" />,
-      },
-      // Chi tiết sản phẩm
-      {
-        path: '/shop/:slug',
-        element: <ProductDetailPage />,
-      },
-      // Giỏ hàng (full page — optional, drawer là chính)
-      {
-        path: '/cart',
-        element: <PageStub name="Giỏ hàng" />,
-      },
-      // Thanh toán
-      {
-        path: '/checkout',
-        element: <PageStub name="Thanh toán" />,
-      },
-      // Tài khoản khách hàng
-      {
-        path: '/account',
-        element: <PageStub name="Tài khoản của tôi" />,
-      },
-      {
-        path: '/account/orders',
-        element: <PageStub name="Lịch sử đơn hàng" />,
-      },
-      {
-        path: '/account/profile',
-        element: <PageStub name="Hồ sơ cá nhân" />,
-      },
-      {
-        path: '/account/addresses',
-        element: <PageStub name="Sổ địa chỉ" />,
+        element: <ProtectedRoute requireAuth={true} allowedRoles={['CUSTOMER', 'ADMIN', 'STAFF']} />,
+        children: [
+          { path: '/account', element: <PageStub name="Tài khoản của tôi" /> },
+          { path: '/account/orders', element: <PageStub name="Lịch sử đơn hàng" /> },
+          { path: '/account/profile', element: <PageStub name="Hồ sơ cá nhân" /> },
+          { path: '/account/addresses', element: <UserAddressPage /> },
+        ],
       },
     ],
   },
@@ -93,58 +77,61 @@ export const router = createBrowserRouter([
         path: '/auth',
         element: <AuthLayout />,
         children: [
-          { path: 'login',    element: <LoginPage /> },
+          { path: 'login', element: <LoginPage /> },
           { path: 'register', element: <RegisterPage /> },
+          { path: 'forgot-password', element: <ForgotPasswordPage /> },
         ],
       },
     ],
   },
 
   /***********************************************************
-   * ADMIN / STAFF DASHBOARD (Protected)
+   * ADMIN / STAFF DASHBOARD (Chỉ ADMIN và STAFF mới được truy cập)
    ***********************************************************/
   {
-    element: <ProtectedRoute requireAuth={true} />,
+    element: <ProtectedRoute requireAuth={true} allowedRoles={['ADMIN', 'STAFF']} />,
     children: [
       {
         element: <MainLayout />,
         children: [
-          // ── Dashboard ────────────────────────────────────
-          { path: '/admin',            element: <AdminDashboardPage /> },
-          { path: '/profile',          element: <PageStub name="Thông tin cá nhân" /> },
+          // ── Dashboard dùng chung (ADMIN & STAFF) ────────
+          { path: '/admin', element: <AdminDashboardPage /> },
+          { path: '/profile', element: <PageStub name="Thông tin cá nhân" /> },
 
-          // ── Catalog ──────────────────────────────────────
-          { path: '/admin/products',   element: <PageStub name="Quản lý Sản phẩm" /> },
-          { path: '/admin/categories', element: <PageStub name="Quản lý Danh mục" /> },
-          { path: '/admin/brands',     element: <PageStub name="Quản lý Thương hiệu" /> },
-
-          // ── Orders ───────────────────────────────────────
-          { path: '/admin/orders',          element: <PageStub name="Quản lý Đơn hàng" /> },
+          // ── Vận hành & Hỗ trợ (ADMIN & STAFF) ────────────
+          { path: '/admin/orders', element: <PageStub name="Quản lý Đơn hàng" /> },
           { path: '/admin/orders/shipping', element: <PageStub name="Xử lý Giao hàng" /> },
+          { path: '/admin/inventory', element: <PageStub name="Quản lý Kho hàng" /> },
+          { path: '/admin/support', element: <PageStub name="Hỗ trợ Khách hàng" /> },
 
-          // ── Inventory ─────────────────────────────────────
-          { path: '/admin/inventory',  element: <PageStub name="Kho hàng" /> },
+          // ── Các trang dành riêng cho ADMIN (STAFF không vào được) ─
+          {
+            element: <ProtectedRoute requireAuth={true} allowedRoles={['ADMIN']} redirectTo="/admin" />,
+            children: [
+              // Catalog
+              { path: '/admin/products', element: <PageStub name="Quản lý Sản phẩm" /> },
+              { path: '/admin/categories', element: <CategoryPage /> },
+              { path: '/admin/brands', element: <BrandsPage /> },
+              { path: '/admin/tags', element: <TagsPage /> },
 
-          // ── Customers ────────────────────────────────────
-          { path: '/admin/customers',       element: <PageStub name="Khách hàng" /> },
-          { path: '/admin/customers/ranks', element: <PageStub name="Hạng thành viên" /> },
+              // Customers & Ranks
+              { path: '/admin/customers', element: <UsersPage /> },
+              { path: '/admin/customers/ranks', element: <RanksPage /> },
+              { path: '/admin/customers/addresses', element: <UserAddressPage /> },
 
-          // ── Staff ─────────────────────────────────────────
-          { path: '/admin/staff',      element: <PageStub name="Quản lý Nhân viên" /> },
+              // Staff / HR
+              { path: '/admin/staff', element: <StaffPage /> },
 
-          // ── Promotions ───────────────────────────────────
-          { path: '/admin/promotions', element: <PageStub name="Chương trình khuyến mãi" /> },
-          { path: '/admin/vouchers',   element: <PageStub name="Mã giảm giá / Voucher" /> },
-          { path: '/admin/banners',    element: <PageStub name="Banner quảng cáo" /> },
+              // Marketing
+              { path: '/admin/promotions', element: <PageStub name="Chương trình khuyến mãi" /> },
+              { path: '/admin/vouchers', element: <PageStub name="Mã giảm giá / Voucher" /> },
+              { path: '/admin/banners', element: <BannersPage /> },
 
-          // ── Customer Support ──────────────────────────────
-          { path: '/admin/support',    element: <PageStub name="Hỗ trợ Khách hàng" /> },
-
-          // ── Reports ──────────────────────────────────────
-          { path: '/admin/reports',    element: <PageStub name="Báo cáo Doanh thu" /> },
-
-          // ── Settings ─────────────────────────────────────
-          { path: '/admin/settings',   element: <PageStub name="Cài đặt Hệ thống" /> },
+              // Reports & System Settings
+              { path: '/admin/reports', element: <PageStub name="Báo cáo Doanh thu" /> },
+              { path: '/admin/settings', element: <PageStub name="Cài đặt Hệ thống" /> },
+            ],
+          },
         ],
       },
     ],

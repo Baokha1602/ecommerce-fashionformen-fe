@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Layout, Dropdown, Badge, Switch } from 'antd';
 import {
   MenuUnfoldOutlined,
@@ -14,6 +15,7 @@ import { logout } from '@/features/auth/store/auth-slice';
 import { useTheme } from '@/app/providers/theme/hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
 import UserAvatar from '@/shared/components/avatar/UserAvatar';
+import AdminNotificationDrawer from '@/features/admin/components/AdminNotificationDrawer';
 
 const { Header } = Layout;
 
@@ -27,6 +29,9 @@ const AppHeader: React.FC<AppHeaderProps> = ({ collapsed, setCollapsed }) => {
   const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(2);
 
   const menuItems = [
     {
@@ -52,25 +57,48 @@ const AppHeader: React.FC<AppHeaderProps> = ({ collapsed, setCollapsed }) => {
     },
   ];
 
+  const isDark = theme === 'dark';
+
   return (
     <Header
-      className={`flex justify-between items-center px-4 border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '0 16px',
+        background: isDark ? '#141414' : '#fff',
+        borderBottom: `1px solid ${isDark ? '#2a2a2a' : '#f0f0f0'}`,
+        color: isDark ? '#e5e5e5' : '#1a1a1a',
+      }}
     >
-      {/* LEFT */}
-      <div className="text-xl cursor-pointer" onClick={() => setCollapsed(!collapsed)}>
+      {/* LEFT — toggle sidebar */}
+      <div
+        style={{ fontSize: 20, cursor: 'pointer', color: isDark ? '#e5e5e5' : '#333' }}
+        onClick={() => setCollapsed(!collapsed)}
+      >
         {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
       </div>
 
       {/* RIGHT */}
       <div className="flex items-center gap-6">
-        {/* Notification */}
-        <Badge count={0} size="small">
-          <BellOutlined className="text-lg cursor-pointer" />
+        {/* Notification Bell */}
+        <Badge count={unreadCount} size="small">
+          <BellOutlined
+            style={{ fontSize: 18, cursor: 'pointer', color: isDark ? '#bbb' : '#555' }}
+            onClick={() => setNotifOpen(true)}
+          />
         </Badge>
+
+        {/* Admin Notification Drawer */}
+        <AdminNotificationDrawer
+          open={notifOpen}
+          onClose={() => setNotifOpen(false)}
+          onUpdateUnreadCount={(cnt) => setUnreadCount(cnt)}
+        />
 
         {/* Theme switch */}
         <Switch
-          checked={theme === 'dark'}
+          checked={isDark}
           onChange={toggleTheme}
           checkedChildren={<SunOutlined />}
           unCheckedChildren={<MoonOutlined />}
@@ -79,13 +107,14 @@ const AppHeader: React.FC<AppHeaderProps> = ({ collapsed, setCollapsed }) => {
         {/* User dropdown */}
         <Dropdown menu={{ items: menuItems }} placement="bottomRight">
           <div className="flex items-center gap-2 cursor-pointer">
-            <UserAvatar size={46} />
-
+            <UserAvatar size={40} />
             <div className="flex flex-col leading-tight">
-              <span className="text-red-500 text-sm font-medium">
+              <span style={{ fontSize: 13, fontWeight: 600, color: isDark ? '#e5e5e5' : '#1a1a1a' }}>
                 {user?.fullName || user?.email}
               </span>
-              <span className="text-xs text-gray-400">{user?.role}</span>
+              <span style={{ fontSize: 11, color: isDark ? '#888' : '#999' }}>
+                {(user?.role || user?.userRole)?.toUpperCase()}
+              </span>
             </div>
           </div>
         </Dropdown>
