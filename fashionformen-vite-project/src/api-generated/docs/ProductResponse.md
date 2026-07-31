@@ -1,0 +1,30 @@
+# ProductResponse
+
+
+## Properties
+
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**id** | **number** |  | [optional] [default to undefined]
+**categoryId** | **number** |  | [optional] [default to undefined]
+**brandId** | **number** |  | [optional] [default to undefined]
+**name** | **string** |  | [optional] [default to undefined]
+**description** | **string** |  | [optional] [default to undefined]
+**soldQuantity** | **number** |  | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { ProductResponse } from './api';
+
+const instance: ProductResponse = {
+    id,
+    categoryId,
+    brandId,
+    name,
+    description,
+    soldQuantity,
+};
+```
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
