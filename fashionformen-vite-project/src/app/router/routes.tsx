@@ -16,6 +16,7 @@ import ProductDetailPage from '@/features/shop/pages/ProductDetailPage';
 // ── Admin Pages ───────────────────────────────────────────────
 import AdminDashboardPage from '@/features/admin/pages/AdminDashboardPage';
 import RanksPage from '@/features/ranks/pages/RanksPage';
+import { CouponPage } from '@/features/coupon/pages/CouponPage';
 
 // ── Page Stub (placeholder cho các trang chưa xây dựng) ───────
 const PageStub = ({ name }: { name: string }) => (
@@ -135,7 +136,7 @@ export const router = createBrowserRouter([
 
           // ── Promotions ───────────────────────────────────
           { path: '/admin/promotions', element: <PageStub name="Chương trình khuyến mãi" /> },
-          { path: '/admin/vouchers',   element: <PageStub name="Mã giảm giá / Voucher" /> },
+          { path: '/admin/coupon',     element: <CouponPage/> },
           { path: '/admin/banners',    element: <PageStub name="Banner quảng cáo" /> },
 
           // ── Customer Support ──────────────────────────────

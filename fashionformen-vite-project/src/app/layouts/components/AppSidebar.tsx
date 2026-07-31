@@ -66,7 +66,7 @@ const NAV_ENTRIES: NavEntry[] = [
 
   { type: 'divider', key: 'd-marketing', label: 'Marketing', roles: ['ADMIN'] },
   { key: '/admin/promotions', icon: <GiftOutlined />,    label: 'Chương trình giảm giá', roles: ['ADMIN'] },
-  { key: '/admin/vouchers',   icon: <TagsOutlined />,    label: 'Mã giảm giá / Voucher', roles: ['ADMIN'] },
+  { key: '/admin/coupon',     icon: <TagsOutlined />,    label: 'Mã giảm giá / Voucher', roles: ['ADMIN'] },
   { key: '/admin/banners',    icon: <PictureOutlined />, label: 'Banner quảng cáo',       roles: ['ADMIN'] },
 
   { type: 'divider', key: 'd-support', label: 'Hỗ trợ' },
