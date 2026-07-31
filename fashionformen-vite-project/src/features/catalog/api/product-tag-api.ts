@@ -1,24 +1,32 @@
+import { ProductTagControllerApi } from '@/api-generated/api';
 import { axiosClient } from '@/shared/lib/axios';
-import type { ProductTag, ProductTagRequest, ProductTagListResponse, ProductTagItemResponse } from '../types/product-tag-type';
+import type { ProductTag, ProductTagRequest } from '../types/product-tag-type';
+
+const api = new ProductTagControllerApi(
+  undefined,
+  axiosClient.defaults.baseURL,
+  axiosClient as any,
+);
 
 export const productTagApi = {
   getAll: async (): Promise<ProductTag[]> => {
-    const response = await axiosClient.get<ProductTagListResponse>('/api/product-tags');
-    return response.data.data;
+    const response = await api.getAllProductTags();
+    return (response.data as any).data ?? [];
   },
   getById: async (id: number): Promise<ProductTag> => {
-    const response = await axiosClient.get<ProductTagItemResponse>(`/api/product-tags/${id}`);
-    return response.data.data;
+    const response = await api.getProductTagById(id);
+    return (response.data as any).data;
   },
   create: async (data: ProductTagRequest): Promise<ProductTag> => {
-    const response = await axiosClient.post<ProductTagItemResponse>('/api/product-tags', data);
-    return response.data.data;
+    const response = await api.createProductTag(data);
+    return (response.data as any).data;
   },
   update: async (id: number, data: ProductTagRequest): Promise<ProductTag> => {
-    const response = await axiosClient.put<ProductTagItemResponse>(`/api/product-tags/${id}`, data);
-    return response.data.data;
+    const response = await api.updateProductTag(id, data);
+    return (response.data as any).data;
   },
   delete: async (id: number): Promise<void> => {
-    await axiosClient.delete(`/api/product-tags/${id}`);
+    await api.deleteProductTag(id);
   }
 };
+

@@ -1,25 +1,15 @@
-import type { ApiResponse } from '@/features/auth/types/auth-type';
+import type {
+  ProductVariantRequest as ProductVariantRequest,
+  ProductVariantResponse as ProductVariant,
+} from '@/api-generated/api';
 
-export interface ProductVariant {
-  id: number;
-  productId: number;
-  sku: string;
-  price: number;
-  discountPrice: number | null;
-  stockQuantity: number;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
+export type { ProductVariantRequest, ProductVariant };
+
+
+export interface ProductVariantState {
+  list: ProductVariant[];
+  loading: boolean;
+  submitting: boolean;
+  error: string | null;
 }
 
-export interface ProductVariantRequest {
-  productId: number;
-  sku: string;
-  price: number;
-  discountPrice?: number;
-  stockQuantity: number;
-  status: string;
-}
-
-export type ProductVariantListResponse = ApiResponse<ProductVariant[]>;
-export type ProductVariantItemResponse = ApiResponse<ProductVariant>;

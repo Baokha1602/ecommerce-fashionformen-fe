@@ -1,17 +1,15 @@
-import type { ApiResponse } from '@/features/auth/types/auth-type';
+import type {
+  CategoryUpsertRequest as CategoryRequest,
+  CategoryResponse as Category,
+} from '@/api-generated/api';
 
-export interface Category {
-  id: number;
-  name: string;
-  description: string | null;
-  createdAt: string;
-  updatedAt: string;
+export type { CategoryRequest, Category };
+
+
+export interface CategoryState {
+  list: Category[];
+  loading: boolean;
+  submitting: boolean;
+  error: string | null;
 }
 
-export interface CategoryRequest {
-  name: string;
-  description?: string;
-}
-
-export type CategoryListResponse = ApiResponse<Category[]>;
-export type CategoryItemResponse = ApiResponse<Category>;

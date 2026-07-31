@@ -1,24 +1,31 @@
+import { CategoryControllerApi } from '@/api-generated/api';
 import { axiosClient } from '@/shared/lib/axios';
-import type { Category, CategoryRequest, CategoryListResponse, CategoryItemResponse } from '../types/category-type';
+import type { Category, CategoryRequest } from '../types/category-type';
+
+const api = new CategoryControllerApi(
+  undefined,
+  axiosClient.defaults.baseURL,
+  axiosClient as any,
+);
 
 export const categoryApi = {
   getAll: async (): Promise<Category[]> => {
-    const response = await axiosClient.get<CategoryListResponse>('/api/categories');
-    return response.data.data;
+    const response = await api.getAll3();
+    return (response.data as any).data ?? [];
   },
   getById: async (id: number): Promise<Category> => {
-    const response = await axiosClient.get<CategoryItemResponse>(`/api/categories/${id}`);
-    return response.data.data;
+    const response = await api.getById4(id);
+    return (response.data as any).data;
   },
   create: async (data: CategoryRequest): Promise<Category> => {
-    const response = await axiosClient.post<CategoryItemResponse>('/api/categories', data);
-    return response.data.data;
+    const response = await api.create4(data);
+    return (response.data as any).data;
   },
   update: async (id: number, data: CategoryRequest): Promise<Category> => {
-    const response = await axiosClient.put<CategoryItemResponse>(`/api/categories/${id}`, data);
-    return response.data.data;
+    const response = await api.update4(id, data);
+    return (response.data as any).data;
   },
   delete: async (id: number): Promise<void> => {
-    await axiosClient.delete(`/api/categories/${id}`);
+    await api.delete4(id);
   }
 };

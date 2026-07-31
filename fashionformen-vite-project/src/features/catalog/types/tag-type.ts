@@ -1,17 +1,15 @@
-import type { ApiResponse } from '@/features/auth/types/auth-type';
+import type {
+  TagCreateRequest as TagRequest,
+  TagResponse as Tag,
+} from '@/api-generated/api';
 
-export interface Tag {
-  id: number;
-  name: string;
-  description: string | null;
-  createdAt: string;
-  updatedAt: string;
+export type { TagRequest, Tag };
+
+
+export interface TagState {
+  list: Tag[];
+  loading: boolean;
+  submitting: boolean;
+  error: string | null;
 }
 
-export interface TagRequest {
-  name: string;
-  description?: string;
-}
-
-export type TagListResponse = ApiResponse<Tag[]>;
-export type TagItemResponse = ApiResponse<Tag>;

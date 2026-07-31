@@ -1,16 +1,15 @@
-import type { ApiResponse } from '@/features/auth/types/auth-type';
+import type {
+  ProductTagRequest as ProductTagRequest,
+  ProductTagResponse as ProductTag,
+} from '@/api-generated/api';
 
-export interface ProductTag {
-  id: number;
-  productId: number;
-  tagId: number;
-  createdAt: string;
+export type { ProductTagRequest, ProductTag };
+
+
+export interface ProductTagState {
+  list: ProductTag[];
+  loading: boolean;
+  submitting: boolean;
+  error: string | null;
 }
 
-export interface ProductTagRequest {
-  productId: number;
-  tagId: number;
-}
-
-export type ProductTagListResponse = ApiResponse<ProductTag[]>;
-export type ProductTagItemResponse = ApiResponse<ProductTag>;

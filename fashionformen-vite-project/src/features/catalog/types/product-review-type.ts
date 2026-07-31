@@ -1,21 +1,15 @@
-import type { ApiResponse } from '@/features/auth/types/auth-type';
+import type {
+  ProductReviewsRequest as ProductReviewRequest,
+  ProductReviewsResponse as ProductReview,
+} from '@/api-generated/api';
 
-export interface ProductReview {
-  id: number;
-  productId: number;
-  userId: number;
-  rating: number;
-  comment: string;
-  createdAt: string;
-  updatedAt: string;
+export type { ProductReviewRequest, ProductReview };
+
+
+export interface ProductReviewState {
+  list: ProductReview[];
+  loading: boolean;
+  submitting: boolean;
+  error: string | null;
 }
 
-export interface ProductReviewRequest {
-  productId: number;
-  userId: number;
-  rating: number;
-  comment: string;
-}
-
-export type ProductReviewListResponse = ApiResponse<ProductReview[]>;
-export type ProductReviewItemResponse = ApiResponse<ProductReview>;

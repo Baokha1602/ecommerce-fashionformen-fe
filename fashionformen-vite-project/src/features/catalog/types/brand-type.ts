@@ -1,17 +1,15 @@
-import type { ApiResponse } from '@/features/auth/types/auth-type';
+import type {
+  BrandUpsertRequest as BrandRequest,
+  BrandResponse as Brand,
+} from '@/api-generated/api';
 
-export interface Brand {
-  id: number;
-  name: string;
-  description: string | null;
-  createdAt: string;
-  updatedAt: string;
+export type { BrandRequest, Brand };
+
+
+export interface BrandState {
+  list: Brand[];
+  loading: boolean;
+  submitting: boolean;
+  error: string | null;
 }
 
-export interface BrandRequest {
-  name: string;
-  description?: string;
-}
-
-export type BrandListResponse = ApiResponse<Brand[]>;
-export type BrandItemResponse = ApiResponse<Brand>;
