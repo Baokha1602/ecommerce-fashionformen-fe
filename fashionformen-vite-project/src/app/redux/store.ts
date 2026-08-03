@@ -10,8 +10,6 @@ import usersReducer from '@/features/users/store/users-slice';
 import userAddressReducer from '@/features/user_address/store/user_address-slice';
 import { otpApi } from '@/features/auth/api/otp-api';
 
-import { couponReducer } from '@/features/coupon/store/coupon-slice';
-
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -24,10 +22,7 @@ export const store = configureStore({
     userAddress: userAddressReducer,
     [otpApi.reducerPath]: otpApi.reducer,
   },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(otpApi.middleware),
-    coupon: couponReducer,
-  },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(otpApi.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
