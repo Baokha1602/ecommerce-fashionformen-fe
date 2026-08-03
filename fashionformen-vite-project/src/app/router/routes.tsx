@@ -12,6 +12,7 @@ import ForgotPasswordPage from '@/features/auth/pages/ForgotPasswordPage';
 
 // ── Storefront Pages ──────────────────────────────────────────
 import LandingPage from '@/features/landing/pages/LandingPage';
+import ShopPage from '@/features/shop/pages/ShopPage';
 import ProductDetailPage from '@/features/shop/pages/ProductDetailPage';
 
 // ── Admin Pages ───────────────────────────────────────────────
@@ -24,6 +25,11 @@ import BannersPage from '@/features/banners/pages/BannersPage';
 import UsersPage from '@/features/users/pages/UsersPage';
 import StaffPage from '@/features/users/pages/StaffPage';
 import UserAddressPage from '@/features/user_address/pages/UserAddressPage';
+import ProductsPage from '@/features/products/pages/ProductsPage';
+import ProductImagesPage from '@/features/product_images/pages/ProductImagesPage';
+import ProductReviewsPage from '@/features/product_reviews/pages/ProductReviewsPage';
+import ProductTagsPage from '@/features/product_tags/pages/ProductTagsPage';
+import ProductVariantsPage from '@/features/product_variants/pages/ProductVariantsPage';
 
 // ── Page Stub (placeholder cho các trang chưa xây dựng) ───────
 const PageStub = ({ name }: { name: string }) => (
@@ -49,7 +55,7 @@ export const router = createBrowserRouter([
     children: [
       // Public pages
       { path: '/', element: <LandingPage /> },
-      { path: '/shop', element: <PageStub name="Cửa hàng - Danh sách sản phẩm" /> },
+      { path: '/shop', element: <ShopPage /> },
       { path: '/shop/:slug', element: <ProductDetailPage /> },
       { path: '/cart', element: <PageStub name="Giỏ hàng" /> },
       { path: '/checkout', element: <PageStub name="Thanh toán" /> },
@@ -109,7 +115,11 @@ export const router = createBrowserRouter([
             element: <ProtectedRoute requireAuth={true} allowedRoles={['ADMIN']} redirectTo="/admin" />,
             children: [
               // Catalog
-              { path: '/admin/products', element: <PageStub name="Quản lý Sản phẩm" /> },
+              { path: '/admin/products', element: <ProductsPage /> },
+              { path: '/admin/products/variants', element: <ProductVariantsPage /> },
+              { path: '/admin/products/images', element: <ProductImagesPage /> },
+              { path: '/admin/products/reviews', element: <ProductReviewsPage /> },
+              { path: '/admin/products/tags', element: <ProductTagsPage /> },
               { path: '/admin/categories', element: <CategoryPage /> },
               { path: '/admin/brands', element: <BrandsPage /> },
               { path: '/admin/tags', element: <TagsPage /> },

@@ -9,15 +9,11 @@ import {
 } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/app/redux/hooks';
-import { fetchAllBannersThunk } from '@/features/banners/store/banners-thunk';
-import { fetchAllBrandsThunk } from '@/features/brands/store/brands-thunk';
-import { fetchAllCategoriesThunk } from '@/features/category/store/category-thunk';
 import { ensureArray } from '@/shared/lib/ensure-array';
 import homeBanner from '@/assets/images/men_fashion_home.png';
 
 
 const LandingPage: React.FC = () => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   // Redux state — dùng dữ liệu thật
@@ -38,11 +34,7 @@ const LandingPage: React.FC = () => {
   const sliderTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Fetch dữ liệu thật khi mount
-  useEffect(() => {
-    dispatch(fetchAllBannersThunk());
-    dispatch(fetchAllBrandsThunk());
-    dispatch(fetchAllCategoriesThunk());
-  }, [dispatch]);
+  // NOTE: Đã chuyển phần dispatch(fetchAll...) lên StorefrontLayout để Header luôn có dữ liệu
 
   // Auto slide
   useEffect(() => {
