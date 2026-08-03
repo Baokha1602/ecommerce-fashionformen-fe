@@ -138,9 +138,8 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ open, onClose }) => {
         open={open}
         onClose={onClose}
         placement="right"
-        width={420}
-        closable={false}
         styles={{
+          wrapper: { width: 420 },
           body: { padding: 0, display: 'flex', flexDirection: 'column', height: '100%' },
           header: { display: 'none' },
         }}

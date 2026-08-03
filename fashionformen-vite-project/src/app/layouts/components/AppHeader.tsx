@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Layout, Dropdown, Badge, Switch } from 'antd';
 import {
   MenuUnfoldOutlined,
@@ -14,6 +15,7 @@ import { logout } from '@/features/auth/store/auth-slice';
 import { useTheme } from '@/app/providers/theme/hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
 import UserAvatar from '@/shared/components/avatar/UserAvatar';
+import AdminNotificationDrawer from '@/features/admin/components/AdminNotificationDrawer';
 
 const { Header } = Layout;
 
@@ -27,6 +29,9 @@ const AppHeader: React.FC<AppHeaderProps> = ({ collapsed, setCollapsed }) => {
   const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(2);
 
   const menuItems = [
     {
@@ -76,12 +81,22 @@ const AppHeader: React.FC<AppHeaderProps> = ({ collapsed, setCollapsed }) => {
 
       {/* RIGHT */}
       <div className="flex items-center gap-6">
-        {/* Notification */}
-        <Badge count={0} size="small">
-          <BellOutlined style={{ fontSize: 18, cursor: 'pointer', color: isDark ? '#bbb' : '#555' }} />
+        {/* Notification Bell */}
+        <Badge count={unreadCount} size="small">
+          <BellOutlined
+            style={{ fontSize: 18, cursor: 'pointer', color: isDark ? '#bbb' : '#555' }}
+            onClick={() => setNotifOpen(true)}
+          />
         </Badge>
 
-        {/* Theme switch — Sun = dark mode bật, Moon = light mode */}
+        {/* Admin Notification Drawer */}
+        <AdminNotificationDrawer
+          open={notifOpen}
+          onClose={() => setNotifOpen(false)}
+          onUpdateUnreadCount={(cnt) => setUnreadCount(cnt)}
+        />
+
+        {/* Theme switch */}
         <Switch
           checked={isDark}
           onChange={toggleTheme}
@@ -98,7 +113,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({ collapsed, setCollapsed }) => {
                 {user?.fullName || user?.email}
               </span>
               <span style={{ fontSize: 11, color: isDark ? '#888' : '#999' }}>
-                {user?.role}
+                {(user?.role || user?.userRole)?.toUpperCase()}
               </span>
             </div>
           </div>
