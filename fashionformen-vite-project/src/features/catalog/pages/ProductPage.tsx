@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Space, Button, Typography, Popconfirm, Tag } from 'antd';
+import { Space, Button, Typography, Popconfirm, Tag, Alert } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import TableCustom from '@/components/table/TableCustom';
 import ModalFormCustom from '@/components/modal/ModalFormCustom';
@@ -125,6 +125,20 @@ const ProductPage: React.FC = () => {
           Thêm mới
         </Button>
       </div>
+
+      <Alert
+        message="Hướng dẫn tạo sản phẩm"
+        description={
+          <ul className="list-disc pl-4 mb-0 text-gray-600">
+            <li>Bước 1: Tạo sản phẩm cơ bản ở đây (Tên, Danh mục, Thương hiệu, Mô tả)</li>
+            <li>Bước 2: Sang tab <b>Biến thể (Variants)</b> để thêm thông tin Giá bán, Giá khuyến mãi và Tồn kho</li>
+            <li>Bước 3: Sang tab <b>Hình ảnh (Images)</b> để upload ảnh cho sản phẩm</li>
+          </ul>
+        }
+        type="info"
+        showIcon
+        className="mb-6 shadow-sm rounded-xl border-blue-200"
+      />
 
       <TableCustom
         columns={columns}
