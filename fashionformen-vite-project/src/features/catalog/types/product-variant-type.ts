@@ -3,22 +3,27 @@ import type { ApiResponse } from '@/features/auth/types/auth-type';
 export interface ProductVariant {
   id: number;
   productId: number;
-  sku: string;
+  productName?: string;
+  name: string;
   price: number;
   discountPrice: number | null;
-  stockQuantity: number;
-  status: string;
+  discountRate: number | null;
+  stockTotal: number;
+  stockLock: number;
+  attributes?: Record<string, string>;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface ProductVariantRequest {
   productId: number;
-  sku: string;
+  name: string;
   price: number;
   discountPrice?: number;
-  stockQuantity: number;
-  status: string;
+  discountRate?: number;
+  stockTotal: number;
+  stockLock?: number;
+  attributeValueIds?: number[];
 }
 
 export type ProductVariantListResponse = ApiResponse<ProductVariant[]>;

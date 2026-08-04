@@ -26,7 +26,9 @@ const ProductVariantPage: React.FC = () => {
       ...values,
       price: Number(values.price),
       discountPrice: values.discountPrice ? Number(values.discountPrice) : undefined,
-      stockQuantity: Number(values.stockQuantity)
+      discountRate: 0,
+      stockTotal: Number(values.stockTotal),
+      stockLock: 0
     }, {
       onSuccess: () => setIsModalOpen(false)
     });
@@ -40,7 +42,9 @@ const ProductVariantPage: React.FC = () => {
           ...values,
           price: Number(values.price),
           discountPrice: values.discountPrice ? Number(values.discountPrice) : undefined,
-          stockQuantity: Number(values.stockQuantity)
+          discountRate: 0,
+          stockTotal: Number(values.stockTotal),
+          stockLock: 0
         } 
       }, {
         onSuccess: () => {
@@ -62,7 +66,7 @@ const ProductVariantPage: React.FC = () => {
         return product ? <Text strong>{product.name}</Text> : <Tag>N/A</Tag>;
       }
     },
-    { title: 'Mã SKU', dataIndex: 'sku', key: 'sku' },
+    { title: 'Tên biến thể', dataIndex: 'name', key: 'name' },
     { 
       title: 'Giá bán', 
       dataIndex: 'price', 
@@ -75,13 +79,8 @@ const ProductVariantPage: React.FC = () => {
       key: 'discountPrice',
       render: (val: number | null) => val ? <Text type="success">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val)}</Text> : '-'
     },
-    { title: 'Tồn kho', dataIndex: 'stockQuantity', key: 'stockQuantity' },
-    { 
-      title: 'Trạng thái', 
-      dataIndex: 'status', 
-      key: 'status',
-      render: (val: string) => <Tag color={val === 'ACTIVE' ? 'green' : 'red'}>{val}</Tag>
-    },
+    { title: 'Tồn kho', dataIndex: 'stockTotal', key: 'stockTotal' },
+    { title: 'Đã giữ', dataIndex: 'stockLock', key: 'stockLock' },
     {
       title: 'Hành động',
       key: 'action',
@@ -115,17 +114,10 @@ const ProductVariantPage: React.FC = () => {
       required: true,
       options: products?.map(p => ({ label: p.name, value: p.id })) || []
     },
-    { name: 'sku', label: 'Mã SKU', type: 'text' as const, required: true },
+    { name: 'name', label: 'Tên biến thể', type: 'text' as const, required: true },
     { name: 'price', label: 'Giá bán', type: 'number' as const, required: true },
     { name: 'discountPrice', label: 'Giá KM', type: 'number' as const },
-    { name: 'stockQuantity', label: 'Số lượng tồn', type: 'number' as const, required: true },
-    { 
-      name: 'status', 
-      label: 'Trạng thái', 
-      type: 'select' as const, 
-      required: true,
-      options: [{label: 'Hoạt động', value: 'ACTIVE'}, {label: 'Ngừng bán', value: 'INACTIVE'}]
-    },
+    { name: 'stockTotal', label: 'Tổng tồn kho', type: 'number' as const, required: true },
   ];
 
   return (

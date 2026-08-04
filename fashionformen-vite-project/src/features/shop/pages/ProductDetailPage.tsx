@@ -81,7 +81,7 @@ const ProductDetailPage: React.FC = () => {
     ? Math.round((1 - (selectedVariant!.discountPrice! / originalPrice)) * 100)
     : 0;
 
-  const inStock = (selectedVariant?.stockQuantity ?? 0) > 0;
+  const inStock = (selectedVariant?.stockTotal ?? 0) > 0;
 
   // ── Handlers ──────────────────────────────────────────────
   const handleAddToCart = () => {
@@ -278,7 +278,7 @@ const ProductDetailPage: React.FC = () => {
                     <Text className="text-sm font-medium">
                       {selectedVariant
                         ? inStock
-                          ? `Còn hàng (${selectedVariant.stockQuantity} sản phẩm)`
+                          ? `Còn hàng (${selectedVariant.stockTotal} sản phẩm)`
                           : 'Hết hàng'
                         : 'Chưa có biến thể'}
                     </Text>
@@ -294,7 +294,7 @@ const ProductDetailPage: React.FC = () => {
                   <Text className="text-sm font-semibold text-gray-700 block mb-3">
                     Biến thể:{' '}
                     <span className="font-bold text-slate-900">
-                      {selectedVariant?.sku ?? 'Chưa chọn'}
+                      {selectedVariant?.name ?? 'Chưa chọn'}
                     </span>
                   </Text>
                   <div className="flex gap-2 flex-wrap">
@@ -302,17 +302,17 @@ const ProductDetailPage: React.FC = () => {
                       <button
                         key={variant.id}
                         onClick={() => setSelectedVariantId(variant.id)}
-                        disabled={variant.status === 'INACTIVE' || variant.stockQuantity === 0}
+                        disabled={variant.stockTotal === 0}
                         className={`px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all
                           ${selectedVariant?.id === variant.id
                             ? 'bg-[#c5a880] border-[#c5a880] text-white shadow-md'
-                            : variant.status === 'INACTIVE' || variant.stockQuantity === 0
+                            : variant.stockTotal === 0
                               ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed line-through'
                               : 'bg-white border-gray-200 text-gray-700 hover:border-[#c5a880]'
                           }`}
                       >
-                        {variant.sku}
-                        {variant.stockQuantity === 0 && ' (Hết)'}
+                        {variant.name}
+                        {variant.stockTotal === 0 && ' (Hết)'}
                       </button>
                     ))}
                   </div>
@@ -326,7 +326,7 @@ const ProductDetailPage: React.FC = () => {
                 </Text>
                 <InputNumber
                   min={1}
-                  max={selectedVariant?.stockQuantity ?? 1}
+                  max={selectedVariant?.stockTotal ?? 1}
                   value={quantity}
                   onChange={(val) => setQuantity(val || 1)}
                   size="large"
