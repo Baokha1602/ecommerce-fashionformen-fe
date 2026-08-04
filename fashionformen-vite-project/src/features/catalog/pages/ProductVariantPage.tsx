@@ -153,7 +153,7 @@ const ProductVariantPage: React.FC = () => {
       <ModalFormCustom
         title={editingId ? 'Sửa biến thể' : 'Thêm biến thể'}
         open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
+        onCancel={() => { setIsModalOpen(false); setEditingId(null); }}
         onSubmit={editingId ? handleUpdate : handleCreate}
         fields={formFields}
         initialValues={editingId ? variants?.find(v => v.id === editingId) : undefined}

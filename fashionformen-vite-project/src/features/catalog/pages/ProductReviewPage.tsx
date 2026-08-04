@@ -6,6 +6,7 @@ import ModalFormCustom from '@/components/modal/ModalFormCustom';
 import { useProductReviewList, useCreateProductReview, useUpdateProductReview, useDeleteProductReview } from '../hooks/useProductReview';
 import { useProductList } from '../hooks/useProduct';
 import type { ProductReview, ProductReviewRequest } from '../types/product-review-type';
+import { useAppSelector } from '@/app/redux/hooks';
 import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
@@ -13,6 +14,7 @@ const { Title, Text } = Typography;
 const ProductReviewPage: React.FC = () => {
   const { data: reviews, isLoading } = useProductReviewList();
   const { data: products } = useProductList();
+  const currentUserId = useAppSelector(state => state.auth?.user?.id ?? 1);
   
   const createReview = useCreateProductReview();
   const updateReview = useUpdateProductReview();
@@ -25,7 +27,7 @@ const ProductReviewPage: React.FC = () => {
     createReview.mutate({
       ...values,
       rating: Number(values.rating),
-      userId: 1 // Default user id for demo
+      userId: currentUserId
     }, {
       onSuccess: () => setIsModalOpen(false)
     });
@@ -38,7 +40,7 @@ const ProductReviewPage: React.FC = () => {
         data: {
           ...values,
           rating: Number(values.rating),
-          userId: 1
+          userId: currentUserId
         } 
       }, {
         onSuccess: () => {
@@ -135,7 +137,7 @@ const ProductReviewPage: React.FC = () => {
       <ModalFormCustom
         title={editingId ? 'Sửa đánh giá' : 'Thêm đánh giá'}
         open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
+        onCancel={() => { setIsModalOpen(false); setEditingId(null); }}
         onSubmit={editingId ? handleUpdate : handleCreate}
         fields={formFields}
         initialValues={editingId ? reviews?.find(r => r.id === editingId) : undefined}

@@ -136,7 +136,7 @@ const ProductPage: React.FC = () => {
       <ModalFormCustom
         title={editingId ? 'Sửa sản phẩm' : 'Thêm sản phẩm'}
         open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
+        onCancel={() => { setIsModalOpen(false); setEditingId(null); }}
         onSubmit={editingId ? handleUpdate : handleCreate}
         fields={formFields}
         initialValues={editingId ? products?.find(p => p.id === editingId) : undefined}
