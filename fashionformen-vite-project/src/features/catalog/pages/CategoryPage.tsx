@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Space, Button, Typography, Popconfirm, Tag } from 'antd';
+import { Space, Button, Typography, Popconfirm } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import TableCustom from '@/components/table/TableCustom';
 import ModalFormCustom from '@/components/modal/ModalFormCustom';

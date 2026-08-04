@@ -6,7 +6,7 @@ import ModalFormCustom from '@/components/modal/ModalFormCustom';
 import { useProductVariantList, useCreateProductVariant, useUpdateProductVariant, useDeleteProductVariant } from '../hooks/useProductVariant';
 import { useProductList } from '../hooks/useProduct';
 import type { ProductVariant, ProductVariantRequest } from '../types/product-variant-type';
-import dayjs from 'dayjs';
+
 
 const { Title, Text } = Typography;
 
