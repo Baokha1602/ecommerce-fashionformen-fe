@@ -8,7 +8,7 @@ import {
   ShopOutlined,
 } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '@/app/redux/hooks';
+import { useAppSelector } from '@/app/redux/hooks';
 import { ensureArray } from '@/shared/lib/ensure-array';
 import homeBanner from '@/assets/images/men_fashion_home.png';
 

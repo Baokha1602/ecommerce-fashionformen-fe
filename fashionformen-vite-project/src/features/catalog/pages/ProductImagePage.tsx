@@ -83,9 +83,8 @@ const ProductImagePage: React.FC = () => {
     { 
       name: 'isMainImage', 
       label: 'Đặt làm ảnh chính', 
-      type: 'select' as const, 
-      required: true,
-      options: [{label: 'Có', value: true}, {label: 'Không', value: false}]
+      type: 'switch' as const, 
+      required: false,
     },
   ];
 

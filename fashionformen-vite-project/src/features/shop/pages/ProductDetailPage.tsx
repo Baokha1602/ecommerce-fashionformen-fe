@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import {
   Button,
-  Tag,
   Badge,
   Rate,
   InputNumber,
   Divider,
   Tabs,
   Typography,
-  Space,
   Breadcrumb,
   message,
+  Spin,
+  Empty,
 } from 'antd';
 import {
   ShoppingCartOutlined,
@@ -20,93 +20,75 @@ import {
   TruckOutlined,
   SafetyCertificateOutlined,
   ReloadOutlined,
-  TagOutlined,
-  CheckOutlined,
   StarFilled,
+  ArrowLeftOutlined,
 } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+
+import { useProduct } from '@/features/catalog/hooks/useProduct';
+import { useProductImageList } from '@/features/catalog/hooks/useProductImage';
+import { useProductVariantList } from '@/features/catalog/hooks/useProductVariant';
+import { useProductReviewList } from '@/features/catalog/hooks/useProductReview';
+import { useBrandList } from '@/features/catalog/hooks/useBrand';
+import { useCategoryList } from '@/features/catalog/hooks/useCategory';
 
 const { Title, Text, Paragraph } = Typography;
 
-// ── Dummy Data ────────────────────────────────────────────────
-const PRODUCT = {
-  id: 'P001',
-  sku: 'POLO-SLIM-001',
-  name: 'Áo Polo SlimFit Premium Cotton',
-  brand: 'FashionForMen',
-  category: 'Áo Polo',
-  rating: 4.7,
-  reviewCount: 128,
-  basePrice: 450000,
-  salePrice: 382500,
-  discountPercent: 15,
-  inStock: true,
-  stockQty: 42,
-  tags: ['#Hot', '#NewArrival', '#SummerCollection'],
-  description:
-    'Áo Polo SlimFit được may từ cotton 100% cao cấp, co giãn 4 chiều. Form slim giúp tôn dáng, phù hợp đi làm, dạo phố hay các buổi gặp mặt casual.',
-  images: [
-    'https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1591195853828-11db59a44f43?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1581655353564-df123a1eb820?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1503341504253-dff4815485f1?q=80&w=800&auto=format&fit=crop',
-  ],
-  colors: [
-    { id: 'navy', label: 'Navy', hex: '#001f5b' },
-    { id: 'white', label: 'Trắng', hex: '#f5f5f5' },
-    { id: 'black', label: 'Đen', hex: '#111111' },
-    { id: 'khaki', label: 'Khaki', hex: '#c5a880' },
-    { id: 'gray', label: 'Xám', hex: '#6b7280' },
-  ],
-  sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-  vouchers: [
-    { code: 'SUMMER15', label: 'Giảm 15% tối đa 50K', type: 'PERCENTAGE' },
-    { code: 'FREESHIP', label: 'Miễn phí vận chuyển', type: 'FIXED' },
-    { code: 'NEWUSER', label: 'Giảm 30K cho đơn đầu', type: 'FIXED' },
-  ],
-};
-
-const REVIEWS_DUMMY = [
-  {
-    id: 1,
-    user: 'Nguyễn Văn A',
-    avatar: 'https://i.pravatar.cc/40?img=1',
-    rating: 5,
-    date: '12/07/2026',
-    comment: 'Áo rất đẹp, chất vải mát, mặc thoải mái. Giao hàng nhanh. Sẽ ủng hộ shop dài dài!',
-  },
-  {
-    id: 2,
-    user: 'Trần Minh B',
-    avatar: 'https://i.pravatar.cc/40?img=8',
-    rating: 4,
-    date: '08/07/2026',
-    comment: 'Chất lượng ổn, form chuẩn. Màu navy đẹp hơn tưởng tượng. Sẽ mua thêm.',
-  },
-  {
-    id: 3,
-    user: 'Lê Hoàng C',
-    avatar: 'https://i.pravatar.cc/40?img=12',
-    rating: 5,
-    date: '01/07/2026',
-    comment: 'Mua làm quà sinh nhật cho bạn, shop đóng gói rất cẩn thận và đẹp. 5 sao xứng đáng.',
-  },
-];
-
-// ── Helper ────────────────────────────────────────────────────
 const formatPrice = (price: number) =>
   new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
 
 // ── Main Component ────────────────────────────────────────────
 const ProductDetailPage: React.FC = () => {
+  const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
+  const productId = slug ? parseInt(slug, 10) : NaN;
+
   const [selectedImage, setSelectedImage] = useState(0);
-  const [selectedColor, setSelectedColor] = useState('navy');
-  const [selectedSize, setSelectedSize] = useState('M');
+  const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [wishlisted, setWishlisted] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 
+  // ── API calls ──────────────────────────────────────────────
+  const { data: product, isLoading: isLoadingProduct } = useProduct(productId);
+  const { data: allImages } = useProductImageList();
+  const { data: allVariants } = useProductVariantList();
+  const { data: allReviews } = useProductReviewList();
+  const { data: brands } = useBrandList();
+  const { data: categories } = useCategoryList();
+
+  // ── Derived data ──────────────────────────────────────────
+  const productImages = allImages?.filter(img => img.productId === productId) ?? [];
+  const galleryImages = productImages.map(img => img.image);
+
+  const productVariants = allVariants?.filter(v => v.productId === productId) ?? [];
+  const selectedVariant = selectedVariantId
+    ? productVariants.find(v => v.id === selectedVariantId)
+    : productVariants[0];
+
+  const productReviews = allReviews?.filter(r => r.productId === productId) ?? [];
+  const avgRating = productReviews.length > 0
+    ? productReviews.reduce((sum, r) => sum + r.rating, 0) / productReviews.length
+    : 0;
+
+  const brandName = brands?.find(b => b.id === product?.brandId)?.name ?? '';
+  const categoryName = categories?.find(c => c.id === product?.categoryId)?.name ?? '';
+
+  const displayPrice = selectedVariant?.discountPrice ?? selectedVariant?.price ?? 0;
+  const originalPrice = selectedVariant?.price ?? 0;
+  const hasDiscount = selectedVariant?.discountPrice != null && selectedVariant.discountPrice < originalPrice;
+  const discountPercent = hasDiscount
+    ? Math.round((1 - (selectedVariant!.discountPrice! / originalPrice)) * 100)
+    : 0;
+
+  const inStock = (selectedVariant?.stockTotal ?? 0) > 0;
+
+  // ── Handlers ──────────────────────────────────────────────
   const handleAddToCart = () => {
+    if (!selectedVariant) {
+      messageApi.warning('Vui lòng chọn biến thể sản phẩm!');
+      return;
+    }
     messageApi.success({
       content: `Đã thêm ${quantity} sản phẩm vào giỏ hàng!`,
       icon: <ShoppingCartOutlined style={{ color: '#c5a880' }} />,
@@ -114,8 +96,47 @@ const ProductDetailPage: React.FC = () => {
   };
 
   const handleBuyNow = () => {
+    if (!selectedVariant) {
+      messageApi.warning('Vui lòng chọn biến thể sản phẩm!');
+      return;
+    }
     messageApi.loading({ content: 'Đang chuyển đến trang thanh toán...', duration: 1.5 });
   };
+
+  // ── Loading / Error states ─────────────────────────────────
+  if (isNaN(productId)) {
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <Empty description="ID sản phẩm không hợp lệ">
+          <Button onClick={() => navigate('/shop')}>Quay lại cửa hàng</Button>
+        </Empty>
+      </div>
+    );
+  }
+
+  if (isLoadingProduct) {
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <Spin size="large" tip="Đang tải sản phẩm..." />
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <Empty description="Không tìm thấy sản phẩm">
+          <Button type="primary" onClick={() => navigate('/shop')}>
+            <ArrowLeftOutlined /> Quay lại cửa hàng
+          </Button>
+        </Empty>
+      </div>
+    );
+  }
+
+  const displayImages = galleryImages.length > 0
+    ? galleryImages
+    : ['https://placehold.co/800x1000?text=No+Image'];
 
   return (
     <>
@@ -127,8 +148,8 @@ const ProductDetailPage: React.FC = () => {
             items={[
               { title: <Link to="/">Trang chủ</Link> },
               { title: <Link to="/shop">Cửa hàng</Link> },
-              { title: PRODUCT.category },
-              { title: PRODUCT.name },
+              ...(categoryName ? [{ title: categoryName }] : []),
+              { title: product.name },
             ]}
           />
         </div>
@@ -142,16 +163,18 @@ const ProductDetailPage: React.FC = () => {
               {/* Main image */}
               <div className="relative overflow-hidden rounded-2xl bg-slate-50 aspect-[4/5] group">
                 <img
-                  src={PRODUCT.images[selectedImage]}
-                  alt={PRODUCT.name}
+                  src={displayImages[selectedImage]}
+                  alt={product.name}
                   className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
                 />
                 {/* Discount badge */}
-                <div className="absolute top-4 left-4">
-                  <span className="bg-red-500 text-white text-sm font-bold px-3 py-1.5 rounded-lg shadow">
-                    -{PRODUCT.discountPercent}%
-                  </span>
-                </div>
+                {hasDiscount && (
+                  <div className="absolute top-4 left-4">
+                    <span className="bg-red-500 text-white text-sm font-bold px-3 py-1.5 rounded-lg shadow">
+                      -{discountPercent}%
+                    </span>
+                  </div>
+                )}
                 {/* Wishlist button */}
                 <button
                   onClick={() => setWishlisted(!wishlisted)}
@@ -169,175 +192,132 @@ const ProductDetailPage: React.FC = () => {
               </div>
 
               {/* Thumbnail strip */}
-              <div className="grid grid-cols-4 gap-3">
-                {PRODUCT.images.map((img, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setSelectedImage(idx)}
-                    className={`overflow-hidden rounded-xl aspect-square border-2 transition-all ${
-                      selectedImage === idx
-                        ? 'border-[#c5a880] shadow-md scale-[0.97]'
-                        : 'border-transparent hover:border-gray-300'
-                    }`}
-                  >
-                    <img
-                      src={img}
-                      alt={`thumb-${idx}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
+              {displayImages.length > 1 && (
+                <div className="grid grid-cols-4 gap-3">
+                  {displayImages.map((img, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setSelectedImage(idx)}
+                      className={`overflow-hidden rounded-xl aspect-square border-2 transition-all ${
+                        selectedImage === idx
+                          ? 'border-[#c5a880] shadow-md scale-[0.97]'
+                          : 'border-transparent hover:border-gray-300'
+                      }`}
+                    >
+                      <img
+                        src={img}
+                        alt={`thumb-${idx}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* ════════ RIGHT — PRODUCT INFO ══════════════════ */}
             <div className="flex flex-col gap-5 py-2">
-              {/* Brand + SKU */}
+              {/* Brand + ID */}
               <div className="flex items-center justify-between">
                 <Text className="text-[#c5a880] font-bold text-xs uppercase tracking-widest">
-                  {PRODUCT.brand}
+                  {brandName}
                 </Text>
-                <Text className="text-gray-400 text-xs">Mã SP: {PRODUCT.sku}</Text>
+                <Text className="text-gray-400 text-xs">Mã SP: #{product.id}</Text>
               </div>
 
               {/* Product name */}
               <Title level={2} className="!mb-0 !text-2xl lg:!text-3xl !font-black !leading-tight">
-                {PRODUCT.name}
+                {product.name}
               </Title>
 
               {/* Rating + Reviews */}
-              <div className="flex items-center gap-3">
-                <Rate
-                  disabled
-                  defaultValue={PRODUCT.rating}
-                  allowHalf
-                  character={<StarFilled style={{ fontSize: 14 }} />}
-                  style={{ color: '#c5a880' }}
-                />
-                <Text className="text-sm text-gray-500">
-                  <strong className="text-slate-700">{PRODUCT.rating}</strong> / 5
-                  ({PRODUCT.reviewCount} đánh giá)
-                </Text>
-              </div>
+              {productReviews.length > 0 && (
+                <div className="flex items-center gap-3">
+                  <Rate
+                    disabled
+                    value={avgRating}
+                    allowHalf
+                    character={<StarFilled style={{ fontSize: 14 }} />}
+                    style={{ color: '#c5a880' }}
+                  />
+                  <Text className="text-sm text-gray-500">
+                    <strong className="text-slate-700">{avgRating.toFixed(1)}</strong> / 5
+                    ({productReviews.length} đánh giá)
+                  </Text>
+                </div>
+              )}
 
               {/* Price block */}
-              <div className="flex items-baseline gap-4 bg-slate-50 rounded-xl px-5 py-4">
-                <span className="text-3xl font-black text-red-600">
-                  {formatPrice(PRODUCT.salePrice)}
-                </span>
-                <span className="text-lg text-gray-400 line-through font-normal">
-                  {formatPrice(PRODUCT.basePrice)}
-                </span>
-                <span className="text-sm bg-red-100 text-red-600 font-bold px-2 py-0.5 rounded-lg">
-                  Tiết kiệm {formatPrice(PRODUCT.basePrice - PRODUCT.salePrice)}
-                </span>
-              </div>
+              {selectedVariant ? (
+                <div className="flex items-baseline gap-4 bg-slate-50 rounded-xl px-5 py-4">
+                  <span className="text-3xl font-black text-red-600">
+                    {formatPrice(displayPrice)}
+                  </span>
+                  {hasDiscount && (
+                    <>
+                      <span className="text-lg text-gray-400 line-through font-normal">
+                        {formatPrice(originalPrice)}
+                      </span>
+                      <span className="text-sm bg-red-100 text-red-600 font-bold px-2 py-0.5 rounded-lg">
+                        Tiết kiệm {formatPrice(originalPrice - displayPrice)}
+                      </span>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <div className="bg-slate-50 rounded-xl px-5 py-4">
+                  <Text className="text-gray-400">Chưa có thông tin giá</Text>
+                </div>
+              )}
 
               {/* Stock status */}
               <div className="flex items-center gap-2">
                 <Badge
-                  status={PRODUCT.inStock ? 'success' : 'error'}
+                  status={inStock ? 'success' : 'error'}
                   text={
                     <Text className="text-sm font-medium">
-                      {PRODUCT.inStock
-                        ? `Còn hàng (${PRODUCT.stockQty} sản phẩm)`
-                        : 'Hết hàng'}
+                      {selectedVariant
+                        ? inStock
+                          ? `Còn hàng (${selectedVariant.stockTotal} sản phẩm)`
+                          : 'Hết hàng'
+                        : 'Chưa có biến thể'}
                     </Text>
                   }
                 />
               </div>
 
-              {/* Voucher tags */}
-              <div>
-                <Text className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2">
-                  <TagOutlined className="mr-1" />
-                  Ưu đãi áp dụng
-                </Text>
-                <Space wrap>
-                  {PRODUCT.vouchers.map((v) => (
-                    <Tag
-                      key={v.code}
-                      color="gold"
-                      bordered
-                      className="!rounded-lg !px-3 !py-1 !text-xs !font-semibold cursor-pointer hover:opacity-80 transition-opacity"
-                      style={{
-                        background: '#fef9ec',
-                        borderColor: '#c5a880',
-                        color: '#8a6a2a',
-                      }}
-                    >
-                      🎫 {v.label}
-                    </Tag>
-                  ))}
-                </Space>
-              </div>
-
               <Divider className="!my-1" />
 
-              {/* Color selector */}
-              <div>
-                <Text className="text-sm font-semibold text-gray-700 block mb-3">
-                  Màu sắc:{' '}
-                  <span className="font-bold text-slate-900">
-                    {PRODUCT.colors.find((c) => c.id === selectedColor)?.label}
-                  </span>
-                </Text>
-                <div className="flex gap-3 flex-wrap">
-                  {PRODUCT.colors.map((color) => (
-                    <button
-                      key={color.id}
-                      onClick={() => setSelectedColor(color.id)}
-                      title={color.label}
-                      className={`relative w-9 h-9 rounded-full border-2 transition-all hover:scale-110 ${
-                        selectedColor === color.id
-                          ? 'border-[#c5a880] scale-110 shadow-md'
-                          : 'border-gray-200'
-                      }`}
-                      style={{ backgroundColor: color.hex }}
-                    >
-                      {selectedColor === color.id && (
-                        <CheckOutlined
-                          className="absolute inset-0 flex items-center justify-center text-white text-xs"
-                          style={{
-                            color: ['white', 'khaki'].includes(color.id) ? '#333' : '#fff',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}
-                        />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Size selector */}
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <Text className="text-sm font-semibold text-gray-700">
-                    Kích cỡ:{' '}
-                    <span className="font-bold text-slate-900">{selectedSize}</span>
+              {/* Variant selector */}
+              {productVariants.length > 0 && (
+                <div>
+                  <Text className="text-sm font-semibold text-gray-700 block mb-3">
+                    Biến thể:{' '}
+                    <span className="font-bold text-slate-900">
+                      {selectedVariant?.name ?? 'Chưa chọn'}
+                    </span>
                   </Text>
-                  <button className="text-xs text-[#c5a880] underline hover:text-[#a08060] transition-colors">
-                    Hướng dẫn chọn size
-                  </button>
+                  <div className="flex gap-2 flex-wrap">
+                    {productVariants.map(variant => (
+                      <button
+                        key={variant.id}
+                        onClick={() => setSelectedVariantId(variant.id)}
+                        disabled={variant.stockTotal === 0}
+                        className={`px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all
+                          ${selectedVariant?.id === variant.id
+                            ? 'bg-[#c5a880] border-[#c5a880] text-white shadow-md'
+                            : variant.stockTotal === 0
+                              ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed line-through'
+                              : 'bg-white border-gray-200 text-gray-700 hover:border-[#c5a880]'
+                          }`}
+                      >
+                        {variant.name}
+                        {variant.stockTotal === 0 && ' (Hết)'}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <div className="flex gap-2 flex-wrap">
-                  {PRODUCT.sizes.map((size) => (
-                    <button
-                      key={size}
-                      onClick={() => setSelectedSize(size)}
-                      className={`w-12 h-12 rounded-xl border-2 text-sm font-bold transition-all hover:border-[#c5a880] ${
-                        selectedSize === size
-                          ? 'bg-[#c5a880] border-[#c5a880] text-white shadow-md'
-                          : 'bg-white border-gray-200 text-gray-700'
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              )}
 
               {/* Quantity picker */}
               <div>
@@ -346,13 +326,14 @@ const ProductDetailPage: React.FC = () => {
                 </Text>
                 <InputNumber
                   min={1}
-                  max={PRODUCT.stockQty}
+                  max={selectedVariant?.stockTotal ?? 1}
                   value={quantity}
                   onChange={(val) => setQuantity(val || 1)}
                   size="large"
                   controls
                   style={{ borderRadius: 10 }}
                   className="!w-32"
+                  disabled={!inStock}
                 />
               </div>
 
@@ -362,6 +343,7 @@ const ProductDetailPage: React.FC = () => {
                   size="large"
                   icon={<ShoppingCartOutlined />}
                   onClick={handleAddToCart}
+                  disabled={!inStock}
                   className="flex-1 h-12 !rounded-xl !border-[#c5a880] !text-[#c5a880] !font-bold hover:!bg-[#c5a880]/10 transition-all"
                 >
                   THÊM VÀO GIỎ
@@ -371,6 +353,7 @@ const ProductDetailPage: React.FC = () => {
                   size="large"
                   icon={<ThunderboltOutlined />}
                   onClick={handleBuyNow}
+                  disabled={!inStock}
                   className="flex-1 h-12 !rounded-xl !font-bold !text-white transition-all hover:scale-[1.02]"
                   style={{
                     background: 'linear-gradient(135deg, #c5a880 0%, #d4af37 100%)',
@@ -413,81 +396,67 @@ const ProductDetailPage: React.FC = () => {
                   label: 'Mô tả sản phẩm',
                   children: (
                     <div className="py-6 max-w-3xl">
-                      <Paragraph className="text-gray-600 leading-relaxed text-base">
-                        {PRODUCT.description}
-                      </Paragraph>
-                      <ul className="mt-4 space-y-2 text-sm text-gray-600">
-                        {['Chất liệu: Cotton 100% cao cấp, 200gsm', 'Co giãn 4 chiều thoải mái', 'Form: Slim Fit — tôn dáng', 'Cổ Polo 3 cúc không bung', 'Không phai màu sau 50 lần giặt'].map((item) => (
-                          <li key={item} className="flex items-start gap-2">
-                            <CheckOutlined style={{ color: '#c5a880', marginTop: 2 }} />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
+                      {product.description ? (
+                        <Paragraph className="text-gray-600 leading-relaxed text-base">
+                          {product.description}
+                        </Paragraph>
+                      ) : (
+                        <Text className="text-gray-400 italic">Chưa có mô tả cho sản phẩm này.</Text>
+                      )}
                     </div>
                   ),
                 },
                 {
                   key: 'reviews',
-                  label: `Đánh giá (${PRODUCT.reviewCount})`,
+                  label: `Đánh giá (${productReviews.length})`,
                   children: (
                     <div className="py-6 space-y-6 max-w-2xl">
-                      {/* Rating summary */}
-                      <div className="flex items-center gap-6 p-5 bg-slate-50 rounded-2xl">
-                        <div className="text-center">
-                          <div className="text-5xl font-black text-slate-800">{PRODUCT.rating}</div>
-                          <Rate
-                            disabled
-                            defaultValue={PRODUCT.rating}
-                            allowHalf
-                            style={{ color: '#c5a880', fontSize: 14 }}
-                          />
-                          <div className="text-xs text-gray-400 mt-1">{PRODUCT.reviewCount} đánh giá</div>
-                        </div>
-                        <div className="flex-1 space-y-1.5">
-                          {[5, 4, 3, 2, 1].map((star) => (
-                            <div key={star} className="flex items-center gap-2 text-xs">
-                              <span className="text-gray-500 w-4">{star}★</span>
-                              <div className="flex-1 bg-gray-200 rounded-full h-1.5">
-                                <div
-                                  className="bg-[#c5a880] h-1.5 rounded-full"
-                                  style={{ width: `${star === 5 ? 70 : star === 4 ? 20 : 5}%` }}
-                                />
+                      {productReviews.length === 0 ? (
+                        <Empty description="Chưa có đánh giá nào" />
+                      ) : (
+                        <>
+                          {/* Rating summary */}
+                          <div className="flex items-center gap-6 p-5 bg-slate-50 rounded-2xl">
+                            <div className="text-center">
+                              <div className="text-5xl font-black text-slate-800">{avgRating.toFixed(1)}</div>
+                              <Rate
+                                disabled
+                                value={avgRating}
+                                allowHalf
+                                style={{ color: '#c5a880', fontSize: 14 }}
+                              />
+                              <div className="text-xs text-gray-400 mt-1">{productReviews.length} đánh giá</div>
+                            </div>
+                          </div>
+
+                          {/* Review list */}
+                          {productReviews.map((review) => (
+                            <div key={review.id} className="flex gap-4 border-b border-gray-100 pb-4">
+                              <div className="w-10 h-10 rounded-full bg-[#c5a880] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                                {review.userId}
                               </div>
-                              <span className="text-gray-400 w-8">
-                                {star === 5 ? '70%' : star === 4 ? '20%' : '5%'}
-                              </span>
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="font-semibold text-slate-700 text-sm">
+                                    Khách hàng #{review.userId}
+                                  </span>
+                                  <span className="text-xs text-gray-400">
+                                    {new Date(review.createdAt).toLocaleDateString('vi-VN')}
+                                  </span>
+                                </div>
+                                <Rate
+                                  disabled
+                                  value={review.rating}
+                                  style={{ fontSize: 12, color: '#c5a880' }}
+                                />
+                                <Paragraph className="!mb-0 text-sm text-gray-600 mt-1">
+                                  {review.comment}
+                                </Paragraph>
+                              </div>
                             </div>
                           ))}
-                        </div>
-                      </div>
-
-                      {/* Review list */}
-                      {REVIEWS_DUMMY.map((review) => (
-                        <div key={review.id} className="flex gap-4">
-                          <img
-                            src={review.avatar}
-                            alt={review.user}
-                            className="w-10 h-10 rounded-full object-cover flex-shrink-0"
-                          />
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="font-semibold text-slate-700 text-sm">
-                                {review.user}
-                              </span>
-                              <span className="text-xs text-gray-400">{review.date}</span>
-                            </div>
-                            <Rate
-                              disabled
-                              defaultValue={review.rating}
-                              style={{ fontSize: 12, color: '#c5a880' }}
-                            />
-                            <Paragraph className="!mb-0 text-sm text-gray-600 mt-1">
-                              {review.comment}
-                            </Paragraph>
-                          </div>
-                        </div>
-                      ))}
+                        </>
+                      )}
                     </div>
                   ),
                 },

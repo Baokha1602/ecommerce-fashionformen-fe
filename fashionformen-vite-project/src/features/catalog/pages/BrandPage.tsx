@@ -100,7 +100,7 @@ const BrandPage: React.FC = () => {
       <ModalFormCustom
         title={editingId ? 'Sửa thương hiệu' : 'Thêm thương hiệu'}
         open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
+        onCancel={() => { setIsModalOpen(false); setEditingId(null); }}
         onSubmit={editingId ? handleUpdate : handleCreate}
         fields={formFields}
         initialValues={editingId ? brands?.find(b => b.id === editingId) : undefined}

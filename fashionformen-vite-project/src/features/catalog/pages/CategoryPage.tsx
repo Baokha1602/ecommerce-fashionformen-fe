@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Space, Button, Typography, Popconfirm, Tag } from 'antd';
+import { Space, Button, Typography, Popconfirm } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import TableCustom from '@/components/table/TableCustom';
 import ModalFormCustom from '@/components/modal/ModalFormCustom';
@@ -100,7 +100,7 @@ const CategoryPage: React.FC = () => {
       <ModalFormCustom
         title={editingId ? 'Sửa danh mục' : 'Thêm danh mục'}
         open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
+        onCancel={() => { setIsModalOpen(false); setEditingId(null); }}
         onSubmit={editingId ? handleUpdate : handleCreate}
         fields={formFields}
         initialValues={editingId ? categories?.find(c => c.id === editingId) : undefined}
