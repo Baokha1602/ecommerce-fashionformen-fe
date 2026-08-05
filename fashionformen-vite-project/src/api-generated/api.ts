@@ -473,6 +473,7 @@ export interface OrderCreateRequest {
     'email'?: string;
     'paymentMethod': OrderCreateRequestPaymentMethodEnum;
     'notes'?: string;
+    'selectedCartItemIds'?: Array<number>;
 }
 
 export const OrderCreateRequestPaymentMethodEnum = {

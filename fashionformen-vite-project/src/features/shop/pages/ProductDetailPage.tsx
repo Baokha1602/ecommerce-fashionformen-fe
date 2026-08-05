@@ -31,6 +31,8 @@ import { useProductVariantList } from '@/features/catalog/hooks/useProductVarian
 import { useProductReviewList } from '@/features/catalog/hooks/useProductReview';
 import { useBrandList } from '@/features/catalog/hooks/useBrand';
 import { useCategoryList } from '@/features/catalog/hooks/useCategory';
+import { useAppDispatch } from '@/app/redux/hooks';
+import { addCartItemThunk } from '@/features/cart/store/cart-thunk';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -41,6 +43,7 @@ const formatPrice = (price: number) =>
 const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const productId = slug ? parseInt(slug, 10) : NaN;
 
   const [selectedImage, setSelectedImage] = useState(0);
@@ -84,23 +87,42 @@ const ProductDetailPage: React.FC = () => {
   const inStock = (selectedVariant?.stockTotal ?? 0) > 0;
 
   // ── Handlers ──────────────────────────────────────────────
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!selectedVariant) {
       messageApi.warning('Vui lòng chọn biến thể sản phẩm!');
       return;
     }
-    messageApi.success({
-      content: `Đã thêm ${quantity} sản phẩm vào giỏ hàng!`,
-      icon: <ShoppingCartOutlined style={{ color: '#c5a880' }} />,
-    });
+    try {
+      await dispatch(addCartItemThunk({ productVariantId: selectedVariant.id!, quantity })).unwrap();
+      messageApi.success({
+        content: `Đã thêm ${quantity} sản phẩm vào giỏ hàng!`,
+        icon: <ShoppingCartOutlined style={{ color: '#c5a880' }} />,
+      });
+    } catch (error) {
+      messageApi.error(error as string);
+    }
   };
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async () => {
     if (!selectedVariant) {
       messageApi.warning('Vui lòng chọn biến thể sản phẩm!');
       return;
     }
-    messageApi.loading({ content: 'Đang chuyển đến trang thanh toán...', duration: 1.5 });
+    try {
+      messageApi.loading({ content: 'Đang xử lý...', key: 'buyNow' });
+      const result = await dispatch(addCartItemThunk({ productVariantId: selectedVariant.id!, quantity })).unwrap();
+      messageApi.destroy('buyNow');
+      
+      const addedCartItem = result.cartItems?.find((item: any) => item.productVariantId === selectedVariant.id);
+      if (addedCartItem) {
+        navigate('/cart', { state: { selectedCartItemIds: [addedCartItem.id] } });
+      } else {
+        navigate('/cart');
+      }
+    } catch (error) {
+      messageApi.destroy('buyNow');
+      messageApi.error(error as string);
+    }
   };
 
   // ── Loading / Error states ─────────────────────────────────

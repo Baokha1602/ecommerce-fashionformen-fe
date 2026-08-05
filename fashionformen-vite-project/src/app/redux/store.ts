@@ -14,6 +14,11 @@ import productReviewsReducer from '@/features/product_reviews/store/product_revi
 import productTagsReducer from '@/features/product_tags/store/product_tags-slice';
 import productVariantsReducer from '@/features/product_variants/store/product_variants-slice';
 import { otpApi } from '@/features/auth/api/otp-api';
+import { couponReducer } from '@/features/coupon/store/coupon-slice';
+import { cartReducer } from '@/features/cart/store/cart-slice';
+import { orderReducer } from '@/features/order/store/order-slice';
+
+import { adminOrdersReducer } from '@/features/order/store/admin-orders-slice';
 
 export const store = configureStore({
   reducer: {
@@ -30,6 +35,10 @@ export const store = configureStore({
     productReviews: productReviewsReducer,
     productTags: productTagsReducer,
     productVariants: productVariantsReducer,
+    coupon: couponReducer,
+    cart: cartReducer,
+    order: orderReducer,
+    adminOrders: adminOrdersReducer,
     [otpApi.reducerPath]: otpApi.reducer,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(otpApi.middleware),

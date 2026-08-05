@@ -6,7 +6,8 @@ import {
   EnvironmentOutlined,
   ShoppingCartOutlined,
   LogoutOutlined,
-  DashboardOutlined
+  DashboardOutlined,
+  UnorderedListOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/app/redux/hooks';
@@ -28,6 +29,12 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({ onCartClick }) => 
   };
 
   const userMenuItems = [
+    {
+      key: 'orders',
+      icon: <UnorderedListOutlined />,
+      label: 'Lịch sử mua hàng',
+      onClick: () => navigate('/account/orders'),
+    },
     {
       key: 'admin',
       icon: <DashboardOutlined />,
@@ -72,7 +79,7 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({ onCartClick }) => 
         <Badge count={0} size="small" showZero={false}>
           <ShoppingCartOutlined
             className="text-lg cursor-pointer hover:text-[#c5a880] transition-colors"
-            onClick={onCartClick}
+            onClick={() => navigate('/cart')}
           />
         </Badge>
 
