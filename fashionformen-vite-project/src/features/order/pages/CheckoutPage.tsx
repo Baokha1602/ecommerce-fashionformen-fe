@@ -114,16 +114,16 @@ export const CheckoutPage: React.FC = () => {
 
     const action = await dispatch(createOrderThunk(orderReq));
     if (createOrderThunk.fulfilled.match(action)) {
-      const orderData: any = action.payload; // orderId is inside
-      const orderId = orderData.orderId;
+      const orderData: any = action.payload;
+      const orderId = orderData?.id || orderData?.orderId;
 
       if (paymentMethod === 'VN_PAY') {
         dispatch(createVnPayUrlThunk(orderId));
       } else if (paymentMethod === 'MOMO') {
         dispatch(createMoMoUrlThunk(orderId));
       } else {
-        message.success('Đặt hàng thành công');
-        navigate('/orders');
+        // COD → trang xác nhận thành công
+        navigate(`/order-success?orderId=${orderId}`, { state: { orderId } });
       }
     }
   };

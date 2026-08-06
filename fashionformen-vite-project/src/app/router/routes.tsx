@@ -17,6 +17,7 @@ import ProductDetailPage from '@/features/shop/pages/ProductDetailPage';
 import { CartPage } from '@/features/cart/pages/CartPage';
 import { CheckoutPage } from '@/features/order/pages/CheckoutPage';
 import { OrderHistoryPage } from '@/features/order/pages/OrderHistoryPage';
+import { OrderSuccessPage } from '@/features/order/pages/OrderSuccessPage';
 import { PaymentResultPage } from '@/features/order/pages/PaymentResultPage';
 
 // ── Admin Pages ───────────────────────────────────────────────
@@ -70,6 +71,7 @@ export const router = createBrowserRouter([
       { path: '/shop/:slug', element: <ProductDetailPage /> },
       { path: '/cart', element: <CartPage /> },
       { path: '/checkout', element: <CheckoutPage /> },
+      { path: '/order-success', element: <OrderSuccessPage /> },
       { path: '/payment-result', element: <PaymentResultPage /> },
 
       // Customer account routes (Cần đăng nhập)

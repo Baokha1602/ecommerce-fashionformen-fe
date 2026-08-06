@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Button, Skeleton } from 'antd';
 import {
   ArrowRightOutlined,
@@ -15,6 +15,8 @@ import { fetchAllCategoriesThunk } from '@/features/category/store/category-thun
 import { fetchAllProductsThunk } from '@/features/products/store/products-thunk';
 import { ensureArray } from '@/shared/lib/ensure-array';
 import homeBanner from '@/assets/images/men_fashion_home.png';
+import { useProductImageList } from '@/features/catalog/hooks/useProductImage';
+import { useProductVariantList } from '@/features/catalog/hooks/useProductVariant';
 
 const LandingPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -34,6 +36,33 @@ const LandingPage: React.FC = () => {
   const activeBrands = ensureArray(brandList).filter((b) => b.isActive !== false);
   const categories = ensureArray(categoryList);
   const products = ensureArray(productList);
+
+  const { data: images } = useProductImageList();
+  const { data: variants } = useProductVariantList();
+
+  const enrichedProducts = useMemo(() => {
+    return products.slice(0, 8).map((product: any) => {
+      const productImages = images?.filter((img: any) => img.productId === product.id) || [];
+      const mainImage = productImages.find((img: any) => img.isMainImage || img.mainImage)?.image 
+                     || productImages[0]?.image 
+                     || 'https://placehold.co/400x500?text=No+Image';
+
+      const productVariants = variants?.filter((v: any) => v.productId === product.id) || [];
+      const lowestPrice = productVariants.length > 0 
+        ? Math.min(...productVariants.map((v: any) => v.discountPrice || v.price))
+        : 0;
+      
+      const categoryName = categories.find((c: any) => c.id === product.categoryId)?.name || 'Fashion';
+
+      return {
+        ...product,
+        mainImage,
+        price: lowestPrice,
+        categoryName,
+        isNew: new Date().getTime() - new Date(product.createdAt || Date.now()).getTime() < 7 * 24 * 60 * 60 * 1000,
+      };
+    });
+  }, [products, images, variants, categories]);
 
   // Slider state
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -242,48 +271,7 @@ const LandingPage: React.FC = () => {
       {/* ── HERO / BANNER SLIDER (THẬT) ────────────────────────── */}
       {renderHero()}
 
-      {/* ── DANH MỤC THẬT ────────────────────────────────────────── */}
-      {(categories.length > 0 || categoriesLoading) && (
-        <section className="py-12 bg-white border-b border-slate-100">
-          <div className="container mx-auto px-6">
-            <div className="flex flex-col items-center justify-center space-y-3 mb-8">
-              <h2 className="text-xl md:text-2xl font-black uppercase tracking-wider text-slate-800">
-                Danh mục sản phẩm
-              </h2>
-              <div className="w-12 h-1 bg-[#c5a880] rounded" />
-            </div>
-
-            {categoriesLoading ? (
-              <div className="flex gap-4 justify-center flex-wrap">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <Skeleton.Button key={i} active style={{ width: 100, height: 40, borderRadius: 20 }} />
-                ))}
-              </div>
-            ) : (
-              <div className="flex flex-wrap gap-3 justify-center">
-                {/* Nút "Tất cả" */}
-                <Link
-                  to="/shop"
-                  className="flex items-center gap-2 px-5 py-2 rounded-full border border-slate-900 bg-slate-900 text-white font-bold text-sm hover:bg-[#c5a880] hover:border-[#c5a880] transition-all shadow-sm"
-                >
-                  <AppstoreOutlined />
-                  Tất cả
-                </Link>
-
-                {categories.map((cat) => (
-                  <Link
-                    key={cat.id}
-                    to={`/shop?category=${cat.id}`}
-                    className="flex items-center gap-2 px-5 py-2 rounded-full border border-slate-200 bg-slate-50 text-slate-700 font-semibold text-sm hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all hover:scale-105 shadow-xs"
-                  >
-                    {cat.name}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
-      )}
+      
 
       {/* ── THƯƠNG HIỆU THẬT ─────────────────────────────────────── */}
       {(activeBrands.length > 0 || brandsLoading) && (
@@ -355,27 +343,19 @@ const LandingPage: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {products.slice(0, 8).map((product: any, idx: number) => (
+            {enrichedProducts.map((product: any, idx: number) => (
               <div
                 key={product.id || idx}
-                onClick={() => navigate(`/product/${product.id}`)}
+                onClick={() => navigate(`/shop/${product.id}`)}
                 className="group cursor-pointer space-y-3"
               >
                 <div className="relative overflow-hidden bg-slate-100 rounded-xl aspect-[3/4]">
                   <img
-                    src={
-                      product.thumbnailUrl ||
-                      product.imageUrl ||
-                      'https://images.unsplash.com/photo-1516257984-b1b4d707412e?q=80&w=600&auto=format&fit=crop'
-                    }
+                    src={product.mainImage}
                     alt={product.name}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  {product.productDiscount ? (
-                    <span className="absolute top-3 left-3 bg-red-600 text-xs font-bold text-white px-2 py-0.5 rounded">
-                      -{product.productDiscount}%
-                    </span>
-                  ) : (
+                  {product.isNew && (
                     <span className="absolute top-3 left-3 bg-[#c5a880] text-xs font-bold text-white px-2 py-0.5 rounded">
                       New
                     </span>
@@ -390,7 +370,7 @@ const LandingPage: React.FC = () => {
                   </h3>
                   <p className="text-sm font-bold text-slate-900">
                     {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
-                      product.minPrice || product.price || 0
+                      product.price || 0
                     )}
                   </p>
                 </div>

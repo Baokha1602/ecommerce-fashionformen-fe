@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { NotificationBell } from '@/features/notifications/components/NotificationBell';
 import { Badge, Dropdown, App } from 'antd';
 import {
   SearchOutlined,
@@ -20,19 +21,21 @@ import { UserAddressFormModal } from '@/features/user_address/components/UserAdd
 import type { UserAddressCreateRequest } from '@/features/user_address/types/user_address-type';
 import logo from '@/assets/images/logo fashion for men.png';
 import { ensureArray } from '@/shared/lib/ensure-array';
+import { useTagList } from '@/features/catalog/hooks/useTag';
+import { useBrandList } from '@/features/catalog/hooks/useBrand';
 
 interface LandingHeaderProps {
   onCartClick?: () => void;
 }
 
-// Tag cố định để lọc sản phẩm theo nhóm
-const QUICK_TAGS = [
-  { label: 'Áo thun', value: 'ao-thun' },
-  { label: 'Áo sơ mi', value: 'ao-so-mi' },
-  { label: 'Quần jean', value: 'quan-jean' },
-  { label: 'Denim', value: 'denim' },
-  { label: 'Polo', value: 'polo' },
-  { label: 'Hoodie', value: 'hoodie' },
+// Tag cố định dự phòng khi API chưa có
+const FALLBACK_TAGS = [
+  { id: 0, name: 'Áo thun' },
+  { id: 0, name: 'Áo sơ mi' },
+  { id: 0, name: 'Quần jean' },
+  { id: 0, name: 'Denim' },
+  { id: 0, name: 'Polo' },
+  { id: 0, name: 'Hoodie' },
 ];
 
 export const LandingHeader: React.FC<LandingHeaderProps> = ({ onCartClick }) => {
@@ -44,6 +47,10 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({ onCartClick }) => 
   const { list: categoryList } = useAppSelector((state) => state.category);
   const { cartDetails } = useAppSelector((state) => state.cart);
   const { submitting: addressSubmitting } = useAppSelector((state) => state.userAddress);
+
+  const { data: apiTags } = useTagList();
+  const { data: apiBrands } = useBrandList();
+  const displayTags = apiTags && apiTags.length > 0 ? apiTags : FALLBACK_TAGS;
 
   // Badge số lượng item thật trong giỏ hàng
   const cartCount = cartDetails?.cartItems?.length ?? 0;
@@ -164,18 +171,21 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({ onCartClick }) => 
                     </div>
                   </div>
 
-                  {/* Cột 3 — Tag nhanh */}
+                  {/* Cột 3 — Tag thật từ API */}
                   <div>
                     <p className="text-xs text-slate-400 uppercase tracking-widest font-bold mb-3 border-b border-slate-100 pb-2">
                       Theo kiểu dáng
                     </p>
                     <div className="flex flex-wrap gap-2">
-                      {QUICK_TAGS.map((tag) => (
-                        <Link key={tag.value} to={`/shop?tag=${tag.value}`} onClick={() => setMegaOpen(false)}
+                      {displayTags.slice(0, 10).map((tag, idx) => (
+                        <Link
+                          key={tag.id || idx}
+                          to={tag.id ? `/shop?tag=${tag.id}` : `/shop?tag=${tag.name.toLowerCase().replace(/\s+/g, '-')}`}
+                          onClick={() => setMegaOpen(false)}
                           className="inline-flex items-center gap-1 px-3 py-1 rounded-full border border-slate-200 text-xs font-bold text-slate-600 hover:border-[#c5a880] hover:text-[#c5a880] transition-all"
                         >
                           <TagsOutlined style={{ fontSize: 10 }} />
-                          {tag.label}
+                          {tag.name}
                         </Link>
                       ))}
                     </div>
@@ -213,6 +223,9 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({ onCartClick }) => 
               onClick={() => { if (onCartClick) onCartClick(); else navigate('/cart'); }}
             />
           </Badge>
+
+          {/* Chuông thông báo — chỉ hiện khi đã đăng nhập, tự poll mỗi 20s */}
+          {user && <NotificationBell />}
 
           {user ? (
             <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">

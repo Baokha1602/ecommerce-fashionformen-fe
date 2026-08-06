@@ -6,7 +6,7 @@ const paymentApi = new PaymentControllerApi(undefined, axiosClient.defaults.base
 
 export const orderApi = {
   createOrder: async (body: OrderCreateRequest) => (await api.createOrder(body)).data.data,
-  getOrderHistory: async (pageable?: Pageable) => (await api.getOrderHistory(pageable)).data.data,
+  getOrderHistory: async (pageable?: Pageable) => (await api.getOrderHistory(pageable ?? {})).data.data,
   getOrderDetails: async (orderId: number) => (await api.getOrderDetails(orderId)).data.data,
   cancelOrder: async (orderId: number) => { await api.cancelOrder(orderId); },
   createMoMoUrl: async (orderId: number) => (await api.createMoMoUrl(orderId)).data.data,
