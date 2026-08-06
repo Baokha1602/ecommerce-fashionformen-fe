@@ -23,4 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 *.env
+# Agents & Auto-generated APIs
 fashionformen-vite-project/.agents/skills/SKILL.md
+fashionformen-vite-project/src/api-generated

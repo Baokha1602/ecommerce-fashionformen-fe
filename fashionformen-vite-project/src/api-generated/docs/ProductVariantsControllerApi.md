@@ -6,7 +6,7 @@ All URIs are relative to *http://localhost:8080*
 |------------- | ------------- | -------------|
 |[**create3**](#create3) | **POST** /api/product-variants | |
 |[**delete3**](#delete3) | **DELETE** /api/product-variants/{id} | |
-|[**getAll2**](#getall2) | **GET** /api/product-variants | |
+|[**getAll3**](#getall3) | **GET** /api/product-variants | |
 |[**getById3**](#getbyid3) | **GET** /api/product-variants/{id} | |
 |[**update3**](#update3) | **PUT** /api/product-variants/{id} | |
 
@@ -111,8 +111,8 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **getAll2**
-> ApiResponseListProductVariantResponse getAll2()
+# **getAll3**
+> ApiResponseListProductVariantResponse getAll3()
 
 
 ### Example
@@ -126,7 +126,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new ProductVariantsControllerApi(configuration);
 
-const { status, data } = await apiInstance.getAll2();
+const { status, data } = await apiInstance.getAll3();
 ```
 
 ### Parameters

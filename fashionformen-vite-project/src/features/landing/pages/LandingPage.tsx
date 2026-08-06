@@ -12,9 +12,9 @@ import { useAppDispatch, useAppSelector } from '@/app/redux/hooks';
 import { fetchAllBannersThunk } from '@/features/banners/store/banners-thunk';
 import { fetchAllBrandsThunk } from '@/features/brands/store/brands-thunk';
 import { fetchAllCategoriesThunk } from '@/features/category/store/category-thunk';
+import { fetchAllProductsThunk } from '@/features/products/store/products-thunk';
 import { ensureArray } from '@/shared/lib/ensure-array';
 import homeBanner from '@/assets/images/men_fashion_home.png';
-
 
 const LandingPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -24,6 +24,7 @@ const LandingPage: React.FC = () => {
   const { list: bannerList, loading: bannersLoading } = useAppSelector((s) => s.banners);
   const { list: brandList, loading: brandsLoading } = useAppSelector((s) => s.brands);
   const { list: categoryList, loading: categoriesLoading } = useAppSelector((s) => s.category);
+  const { list: productList, loading: productsLoading } = useAppSelector((s) => s.products);
 
   // Banners thật (chỉ active, sắp xếp theo displayOrder)
   const activeBanners = ensureArray(bannerList)
@@ -32,6 +33,7 @@ const LandingPage: React.FC = () => {
 
   const activeBrands = ensureArray(brandList).filter((b) => b.isActive !== false);
   const categories = ensureArray(categoryList);
+  const products = ensureArray(productList);
 
   // Slider state
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -42,6 +44,7 @@ const LandingPage: React.FC = () => {
     dispatch(fetchAllBannersThunk());
     dispatch(fetchAllBrandsThunk());
     dispatch(fetchAllCategoriesThunk());
+    dispatch(fetchAllProductsThunk());
   }, [dispatch]);
 
   // Auto slide
@@ -332,7 +335,7 @@ const LandingPage: React.FC = () => {
         </section>
       )}
 
-      {/* ── SẢN PHẨM NỔI BẬT (placeholder — chờ Products API) ────── */}
+      {/* ── SẢN PHẨM NỔI BẬT (DỮ LIỆU THẬT TỪ REDUX / API) ────── */}
       <section className="py-16 container mx-auto px-6">
         <div className="flex flex-col items-center justify-center space-y-3 mb-12">
           <h2 className="text-2xl md:text-3xl font-black uppercase tracking-wider text-slate-800">
@@ -341,73 +344,60 @@ const LandingPage: React.FC = () => {
           <div className="w-16 h-1 bg-[#c5a880] rounded" />
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {/* Product Card 1 */}
-          <div className="group cursor-pointer space-y-3">
-            <div className="relative overflow-hidden bg-slate-100 rounded-xl aspect-[3/4]">
-              <img
-                src="https://images.unsplash.com/photo-1516257984-b1b4d707412e?q=80&w=600&auto=format&fit=crop"
-                alt="Denim Shirt"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-              <span className="absolute top-3 left-3 bg-[#c5a880] text-xs font-bold text-white px-2 py-0.5 rounded">New</span>
-            </div>
-            <div className="space-y-1">
-              <p className="text-xs text-slate-400 font-bold uppercase">Denim</p>
-              <h3 className="text-sm font-semibold text-slate-700 group-hover:text-[#c5a880] transition-colors truncate">Áo Sơ Mi Denim Classic</h3>
-              <p className="text-sm font-bold text-slate-900">450,000đ</p>
-            </div>
+        {productsLoading && products.length === 0 ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="space-y-3">
+                <Skeleton.Button active style={{ width: '100%', height: 260, borderRadius: 12 }} />
+                <Skeleton active paragraph={{ rows: 2 }} />
+              </div>
+            ))}
           </div>
-
-          {/* Product Card 2 */}
-          <div className="group cursor-pointer space-y-3">
-            <div className="relative overflow-hidden bg-slate-100 rounded-xl aspect-[3/4]">
-              <img
-                src="https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=600&auto=format&fit=crop"
-                alt="Polo Shirt"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-              <span className="absolute top-3 left-3 bg-red-600 text-xs font-bold text-white px-2 py-0.5 rounded">-15%</span>
-            </div>
-            <div className="space-y-1">
-              <p className="text-xs text-slate-400 font-bold uppercase">Polo</p>
-              <h3 className="text-sm font-semibold text-slate-700 group-hover:text-[#c5a880] transition-colors truncate">Áo Polo Slimfit Cotton</h3>
-              <p className="text-sm font-bold text-slate-900">382,500đ <span className="text-xs text-slate-400 line-through font-normal ml-1">450,000đ</span></p>
-            </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {products.slice(0, 8).map((product: any, idx: number) => (
+              <div
+                key={product.id || idx}
+                onClick={() => navigate(`/product/${product.id}`)}
+                className="group cursor-pointer space-y-3"
+              >
+                <div className="relative overflow-hidden bg-slate-100 rounded-xl aspect-[3/4]">
+                  <img
+                    src={
+                      product.thumbnailUrl ||
+                      product.imageUrl ||
+                      'https://images.unsplash.com/photo-1516257984-b1b4d707412e?q=80&w=600&auto=format&fit=crop'
+                    }
+                    alt={product.name}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  {product.productDiscount ? (
+                    <span className="absolute top-3 left-3 bg-red-600 text-xs font-bold text-white px-2 py-0.5 rounded">
+                      -{product.productDiscount}%
+                    </span>
+                  ) : (
+                    <span className="absolute top-3 left-3 bg-[#c5a880] text-xs font-bold text-white px-2 py-0.5 rounded">
+                      New
+                    </span>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-slate-400 font-bold uppercase">
+                    {product.brandName || product.categoryName || 'Fashion'}
+                  </p>
+                  <h3 className="text-sm font-semibold text-slate-700 group-hover:text-[#c5a880] transition-colors truncate">
+                    {product.name}
+                  </h3>
+                  <p className="text-sm font-bold text-slate-900">
+                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
+                      product.minPrice || product.price || 0
+                    )}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
-
-          {/* Product Card 3 */}
-          <div className="group cursor-pointer space-y-3">
-            <div className="relative overflow-hidden bg-slate-100 rounded-xl aspect-[3/4]">
-              <img
-                src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=600&auto=format&fit=crop"
-                alt="Blazer"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-            </div>
-            <div className="space-y-1">
-              <p className="text-xs text-slate-400 font-bold uppercase">Suite</p>
-              <h3 className="text-sm font-semibold text-slate-700 group-hover:text-[#c5a880] transition-colors truncate">Áo Blazer Nam Premium</h3>
-              <p className="text-sm font-bold text-slate-900">1,250,000đ</p>
-            </div>
-          </div>
-
-          {/* Product Card 4 */}
-          <div className="group cursor-pointer space-y-3">
-            <div className="relative overflow-hidden bg-slate-100 rounded-xl aspect-[3/4]">
-              <img
-                src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=600&auto=format&fit=crop"
-                alt="Casual Trousers"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-            </div>
-            <div className="space-y-1">
-              <p className="text-xs text-slate-400 font-bold uppercase">Trousers</p>
-              <h3 className="text-sm font-semibold text-slate-700 group-hover:text-[#c5a880] transition-colors truncate">Quần Tây Nam Hàn Quốc</h3>
-              <p className="text-sm font-bold text-slate-900">520,000đ</p>
-            </div>
-          </div>
-        </div>
+        )}
 
         <div className="flex justify-center mt-10">
           <Button

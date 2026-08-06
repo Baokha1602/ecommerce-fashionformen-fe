@@ -8,7 +8,17 @@ import tagsReducer from '@/features/tags/store/tags-slice';
 import bannersReducer from '@/features/banners/store/banners-slice';
 import usersReducer from '@/features/users/store/users-slice';
 import userAddressReducer from '@/features/user_address/store/user_address-slice';
+import productsReducer from '@/features/products/store/products-slice';
+import productImagesReducer from '@/features/product_images/store/product_images-slice';
+import productReviewsReducer from '@/features/product_reviews/store/product_reviews-slice';
+import productTagsReducer from '@/features/product_tags/store/product_tags-slice';
+import productVariantsReducer from '@/features/product_variants/store/product_variants-slice';
 import { otpApi } from '@/features/auth/api/otp-api';
+import { couponReducer } from '@/features/coupon/store/coupon-slice';
+import { cartReducer } from '@/features/cart/store/cart-slice';
+import { orderReducer } from '@/features/order/store/order-slice';
+
+import { adminOrdersReducer } from '@/features/order/store/admin-orders-slice';
 
 export const store = configureStore({
   reducer: {
@@ -20,10 +30,18 @@ export const store = configureStore({
     banners: bannersReducer,
     users: usersReducer,
     userAddress: userAddressReducer,
+    products: productsReducer,
+    productImages: productImagesReducer,
+    productReviews: productReviewsReducer,
+    productTags: productTagsReducer,
+    productVariants: productVariantsReducer,
+    coupon: couponReducer,
+    cart: cartReducer,
+    order: orderReducer,
+    adminOrders: adminOrdersReducer,
     [otpApi.reducerPath]: otpApi.reducer,
   },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(otpApi.middleware),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(otpApi.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

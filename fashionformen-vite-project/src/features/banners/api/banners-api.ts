@@ -10,7 +10,7 @@ const apiInstance = new BannerControllerApi(
 
 export const bannersApi = {
   getAll: async (): Promise<BannerResponse[]> => {
-    const response = await apiInstance.getAll5();
+    const response = await apiInstance.getAll6();
     return (response.data as any).data ?? [];
   },
 

@@ -12,6 +12,7 @@ Name | Type | Description | Notes
 **email** | **string** |  | [optional] [default to undefined]
 **paymentMethod** | **string** |  | [default to undefined]
 **notes** | **string** |  | [optional] [default to undefined]
+**selectedCartItemIds** | **Array&lt;number&gt;** |  | [default to undefined]
 
 ## Example
 
@@ -26,6 +27,7 @@ const instance: OrderCreateRequest = {
     email,
     paymentMethod,
     notes,
+    selectedCartItemIds,
 };
 ```
 

@@ -25,7 +25,8 @@ import { useAppSelector } from '@/app/redux/hooks';
 
 const { Sider } = Layout;
 
-const LOGO_H = 64; // px
+const LOGO_H = 64;
+const FOOTER_H = 48;
 
 type UserRole = 'ADMIN' | 'STAFF' | string;
 
@@ -50,36 +51,49 @@ interface AppSidebarProps {
   collapsed: boolean;
 }
 
+// Cấu trúc danh mục phẳng (Flat Structure) đúng theo yêu cầu từ đoạn code 2
 const NAV_ENTRIES: NavEntry[] = [
+  // ── DASHBOARD ──────────────────────────────────────────────────
   { key: '/admin', icon: <DashboardOutlined />, label: 'Dashboard', roles: ['ADMIN', 'STAFF'] },
 
+  // ── CATALOG ────────────────────────────────────────────────────
   { type: 'divider', key: 'd-catalog', label: 'Catalog', roles: ['ADMIN'] },
-  { key: '/admin/products', icon: <ShoppingOutlined />, label: 'Quản lý Sản phẩm', roles: ['ADMIN'] },
-  { key: '/admin/categories', icon: <AppstoreOutlined />, label: 'Quản lý Danh mục', roles: ['ADMIN'] },
-  { key: '/admin/brands', icon: <BarcodeOutlined />, label: 'Quản lý Thương hiệu', roles: ['ADMIN'] },
+  { key: '/admin/products', icon: <ShoppingOutlined />, label: 'Sản phẩm', roles: ['ADMIN'] },
+  { key: '/admin/products/variants', icon: <BarcodeOutlined />, label: 'Biến thể sản phẩm', roles: ['ADMIN'] },
+  { key: '/admin/products/images', icon: <PictureOutlined />, label: 'Hình ảnh sản phẩm', roles: ['ADMIN'] },
+  { key: '/admin/products/tags', icon: <TagsOutlined />, label: 'Gán Tag sản phẩm', roles: ['ADMIN'] },
+  { key: '/admin/products/reviews', icon: <TeamOutlined />, label: 'Đánh giá sản phẩm', roles: ['ADMIN'] },
+  { key: '/admin/categories', icon: <AppstoreOutlined />, label: 'Danh mục', roles: ['ADMIN'] },
+  { key: '/admin/brands', icon: <BarcodeOutlined />, label: 'Thương hiệu', roles: ['ADMIN'] },
   { key: '/admin/tags', icon: <TagsOutlined />, label: 'Quản lý Tags', roles: ['ADMIN'] },
 
+  // ── VẬN HÀNH ───────────────────────────────────────────────────
   { type: 'divider', key: 'd-ops', label: 'Vận hành', roles: ['ADMIN', 'STAFF'] },
   { key: '/admin/orders', icon: <InboxOutlined />, label: 'Quản lý Đơn hàng', roles: ['ADMIN', 'STAFF'] },
   { key: '/admin/orders/shipping', icon: <TruckOutlined />, label: 'Xử lý Giao hàng', roles: ['ADMIN', 'STAFF'] },
   { key: '/admin/inventory', icon: <InboxOutlined />, label: 'Quản lý Kho hàng', roles: ['ADMIN', 'STAFF'] },
 
+  // ── KHÁCH HÀNG ─────────────────────────────────────────────────
   { type: 'divider', key: 'd-customers', label: 'Khách hàng', roles: ['ADMIN'] },
-  { key: '/admin/customers', icon: <TeamOutlined />, label: 'Quản lý Người dùng', roles: ['ADMIN'] },
-  { key: '/admin/customers/ranks', icon: <CrownOutlined />, label: 'Quản lý Hạng thành viên', roles: ['ADMIN'] },
-  { key: '/admin/customers/addresses', icon: <EnvironmentOutlined />, label: 'Quản lý Địa chỉ        ', roles: ['ADMIN'] },
+  { key: '/admin/customers', icon: <TeamOutlined />, label: 'Danh sách khách hàng', roles: ['ADMIN'] },
+  { key: '/admin/customers/ranks', icon: <CrownOutlined />, label: 'Hạng thành viên', roles: ['ADMIN'] },
+  { key: '/admin/customers/addresses', icon: <EnvironmentOutlined />, label: 'Địa chỉ khách hàng', roles: ['ADMIN'] },
 
+  // ── NHÂN SỰ ────────────────────────────────────────────────────
   { type: 'divider', key: 'd-hr', label: 'Nhân sự', roles: ['ADMIN'] },
   { key: '/admin/staff', icon: <UserSwitchOutlined />, label: 'Quản lý Nhân viên', roles: ['ADMIN'] },
 
+  // ── MARKETING ──────────────────────────────────────────────────
   { type: 'divider', key: 'd-marketing', label: 'Marketing', roles: ['ADMIN'] },
   { key: '/admin/promotions', icon: <GiftOutlined />, label: 'Chương trình Khuyến mãi', roles: ['ADMIN'] },
   { key: '/admin/vouchers', icon: <TagsOutlined />, label: 'Mã giảm giá / Voucher', roles: ['ADMIN'] },
   { key: '/admin/banners', icon: <PictureOutlined />, label: 'Banner Quảng cáo', roles: ['ADMIN'] },
 
+  // ── HỖ TRỢ ─────────────────────────────────────────────────────
   { type: 'divider', key: 'd-support', label: 'Hỗ trợ', roles: ['ADMIN', 'STAFF'] },
   { key: '/admin/support', icon: <CustomerServiceOutlined />, label: 'Hỗ trợ Khách hàng', roles: ['ADMIN', 'STAFF'] },
 
+  // ── HỆ THỐNG ───────────────────────────────────────────────────
   { type: 'divider', key: 'd-system', label: 'Hệ thống', roles: ['ADMIN'] },
   { key: '/admin/reports', icon: <BarChartOutlined />, label: 'Báo cáo Doanh thu', roles: ['ADMIN'] },
   { key: '/admin/settings', icon: <SettingOutlined />, label: 'Cài đặt Hệ thống', roles: ['ADMIN'] },
@@ -111,10 +125,12 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed }) => {
     };
   }, []);
 
+  // Lọc theo Role
   const filteredEntries = NAV_ENTRIES.filter(
     (e) => !e.roles || (role && e.roles.some((r) => r.toUpperCase() === role)),
   );
 
+  // Map cấu hình sang Menu items của Ant Design
   const menuItems: MenuProps['items'] = filteredEntries.map((entry) => {
     if (entry.type === 'divider') {
       return {
@@ -150,6 +166,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed }) => {
   });
 
   const bgColor = isDark ? '#001529' : '#fff';
+  const totalHeaderFooterH = collapsed ? LOGO_H : LOGO_H + FOOTER_H;
 
   return (
     <Sider
@@ -182,7 +199,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed }) => {
         <div
           ref={scrollRef}
           style={{
-            height: `calc(100vh - ${LOGO_H}px)`,
+            height: `calc(100vh - ${totalHeaderFooterH}px)`,
             overflowY: 'auto',
             overflowX: 'hidden',
             paddingBottom: 20,
@@ -212,7 +229,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed }) => {
               bottom: 0,
               left: 0,
               right: 0,
-              height: 56,
+              height: 40,
               pointerEvents: 'none',
               background: isDark
                 ? 'linear-gradient(to bottom, transparent, #001529)'
@@ -221,6 +238,25 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed }) => {
           />
         )}
       </div>
+
+      {/* ── Role Badge (Bottom) ─────────────────────────────── */}
+      {!collapsed && (
+        <div
+          className={`px-4 border-t text-xs flex items-center gap-2 flex-shrink-0 ${isDark ? 'border-white/10 text-gray-400' : 'border-gray-100 text-gray-500'
+            }`}
+          style={{ height: FOOTER_H }}
+        >
+          <span
+            className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${role === 'ADMIN'
+                ? 'bg-amber-500/20 text-amber-500'
+                : 'bg-blue-500/20 text-blue-400'
+              }`}
+          >
+            {role || 'ADMIN'}
+          </span>
+          <span className="truncate">{user?.fullName || user?.email || 'Admin User'}</span>
+        </div>
+      )}
     </Sider>
   );
 };

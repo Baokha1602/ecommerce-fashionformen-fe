@@ -10,7 +10,7 @@ const apiInstance = new BrandControllerApi(
 
 export const brandsApi = {
   getAll: async (): Promise<BrandResponse[]> => {
-    const response = await apiInstance.getAll4();
+    const response = await apiInstance.getAll5();
     return (response.data as any).data ?? [];
   },
 

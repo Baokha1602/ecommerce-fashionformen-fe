@@ -6,7 +6,7 @@ All URIs are relative to *http://localhost:8080*
 |------------- | ------------- | -------------|
 |[**create4**](#create4) | **POST** /api/categories | |
 |[**delete4**](#delete4) | **DELETE** /api/categories/{id} | |
-|[**getAll3**](#getall3) | **GET** /api/categories | |
+|[**getAll4**](#getall4) | **GET** /api/categories | |
 |[**getById4**](#getbyid4) | **GET** /api/categories/{id} | |
 |[**update4**](#update4) | **PUT** /api/categories/{id} | |
 
@@ -111,8 +111,8 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **getAll3**
-> ApiResponseListCategoryResponse getAll3()
+# **getAll4**
+> ApiResponseListCategoryResponse getAll4()
 
 
 ### Example
@@ -126,7 +126,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new CategoryControllerApi(configuration);
 
-const { status, data } = await apiInstance.getAll3();
+const { status, data } = await apiInstance.getAll4();
 ```
 
 ### Parameters

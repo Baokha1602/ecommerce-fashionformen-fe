@@ -10,7 +10,7 @@ const apiInstance = new TagControllerApi(
 
 export const tagsApi = {
   getAll: async (): Promise<TagResponse[]> => {
-    const response = await apiInstance.getAll();
+    const response = await apiInstance.getAll1();
     return (response.data as any).data ?? [];
   },
 

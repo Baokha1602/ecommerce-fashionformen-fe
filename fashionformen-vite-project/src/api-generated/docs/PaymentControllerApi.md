@@ -5,6 +5,7 @@ All URIs are relative to *http://localhost:8080*
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
 |[**moMoIpn**](#momoipn) | **POST** /api/payments/momo/ipn | |
+|[**moMoReturn**](#momoreturn) | **GET** /api/payments/momo/return | |
 |[**vnPayIpn**](#vnpayipn) | **GET** /api/payments/vnpay/ipn | |
 |[**vnPayReturn**](#vnpayreturn) | **GET** /api/payments/vnpay/return | |
 
@@ -23,7 +24,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new PaymentControllerApi(configuration);
 
-let requestBody: { [key: string]: string; }; //
+let requestBody: { [key: string]: object; }; //
 
 const { status, data } = await apiInstance.moMoIpn(
     requestBody
@@ -34,7 +35,7 @@ const { status, data } = await apiInstance.moMoIpn(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **requestBody** | **{ [key: string]: string; }**|  | |
+| **requestBody** | **{ [key: string]: object; }**|  | |
 
 
 ### Return type
@@ -48,6 +49,56 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: */*
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **moMoReturn**
+> string moMoReturn()
+
+
+### Example
+
+```typescript
+import {
+    PaymentControllerApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new PaymentControllerApi(configuration);
+
+let params: { [key: string]: string; }; // (default to undefined)
+
+const { status, data } = await apiInstance.moMoReturn(
+    params
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **params** | **{ [key: string]: string; }** |  | defaults to undefined|
+
+
+### Return type
+
+**string**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
  - **Accept**: */*
 
 

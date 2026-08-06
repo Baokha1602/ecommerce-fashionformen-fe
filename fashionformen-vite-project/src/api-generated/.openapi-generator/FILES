@@ -10,6 +10,7 @@ docs/AdminPromotionControllerApi.md
 docs/AdminUserControllerApi.md
 docs/ApiResponseAuthResponse.md
 docs/ApiResponseBannerResponse.md
+docs/ApiResponseBigDecimal.md
 docs/ApiResponseBrandResponse.md
 docs/ApiResponseCartResponse.md
 docs/ApiResponseCategoryResponse.md
@@ -130,5 +131,6 @@ docs/UserAddressUpdateRequest.md
 docs/UserLoginRequest.md
 docs/UserRegisterRequest.md
 docs/UserResponse.md
+docs/UserUpdateRequest.md
 git_push.sh
 index.ts

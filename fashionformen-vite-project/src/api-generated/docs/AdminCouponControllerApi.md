@@ -6,7 +6,7 @@ All URIs are relative to *http://localhost:8080*
 |------------- | ------------- | -------------|
 |[**create7**](#create7) | **POST** /api/admin/coupons | |
 |[**delete7**](#delete7) | **DELETE** /api/admin/coupons/{id} | |
-|[**getAll6**](#getall6) | **GET** /api/admin/coupons | |
+|[**getAll7**](#getall7) | **GET** /api/admin/coupons | |
 |[**getById7**](#getbyid7) | **GET** /api/admin/coupons/{id} | |
 |[**getUsageHistory**](#getusagehistory) | **GET** /api/admin/coupons/{id}/usage-history | |
 |[**update7**](#update7) | **PUT** /api/admin/coupons/{id} | |
@@ -112,8 +112,8 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **getAll6**
-> ApiResponseListCouponResponse getAll6()
+# **getAll7**
+> ApiResponseListCouponResponse getAll7()
 
 
 ### Example
@@ -127,7 +127,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new AdminCouponControllerApi(configuration);
 
-const { status, data } = await apiInstance.getAll6();
+const { status, data } = await apiInstance.getAll7();
 ```
 
 ### Parameters

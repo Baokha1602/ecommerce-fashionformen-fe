@@ -1,174 +1,86 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
-  Card,
-  Table,
-  Tag,
-  Badge,
-  Typography,
-  Space,
-  Progress,
-  Statistic,
-  Row,
-  Col,
-  Button,
-  Avatar,
-  Select,
+  Card, Table, Tag, Typography, Space,
+  Progress, Statistic, Row, Col, Button, Avatar,
 } from 'antd';
 import {
-  ArrowUpOutlined,
-  ArrowDownOutlined,
-  ShoppingOutlined,
-  TeamOutlined,
-  InboxOutlined,
-  WarningOutlined,
-  EyeOutlined,
-  ReloadOutlined,
+  ShoppingOutlined, TeamOutlined, InboxOutlined,
+  EyeOutlined, ReloadOutlined,
+  DollarOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
+import { useAppDispatch, useAppSelector } from '@/app/redux/hooks';
+import { fetchAllAdminOrdersThunk } from '@/features/order/store/admin-orders-thunk';
+import { fetchAllUsersThunk } from '@/features/users/store/users-thunk';
+import { fetchAllProductsThunk } from '@/features/products/store/products-thunk';
+import { ORDER_STATUS_MAP, PAYMENT_METHOD_MAP } from '@/features/order/constants/admin-orders-constants';
+import { GetAllOrdersOrderStatusEnum } from '@/features/order/types/admin-orders-type';
+import type { OrderResponse } from '@/features/order/types/admin-orders-type';
 
 const { Title, Text } = Typography;
-
-// ── Dummy Data ────────────────────────────────────────────────
-const STATS = [
-  {
-    key: 'revenue',
-    label: 'Doanh thu tháng này',
-    value: 48750000,
-    prefix: '',
-    suffix: '₫',
-    trend: 12.5,
-    trendUp: true,
-    icon: '💰',
-    color: '#c5a880',
-    bg: 'from-amber-50 to-orange-50',
-  },
-  {
-    key: 'orders',
-    label: 'Đơn hàng mới',
-    value: 284,
-    suffix: ' đơn',
-    trend: 8.2,
-    trendUp: true,
-    icon: '📦',
-    color: '#1677ff',
-    bg: 'from-blue-50 to-indigo-50',
-  },
-  {
-    key: 'customers',
-    label: 'Khách hàng mới',
-    value: 63,
-    suffix: ' người',
-    trend: 3.1,
-    trendUp: false,
-    icon: '👥',
-    color: '#52c41a',
-    bg: 'from-green-50 to-emerald-50',
-  },
-  {
-    key: 'lowstock',
-    label: 'Sản phẩm sắp hết',
-    value: 7,
-    suffix: ' SKU',
-    trend: null,
-    trendUp: false,
-    icon: '⚠️',
-    color: '#ff4d4f',
-    bg: 'from-red-50 to-rose-50',
-  },
-];
-
-interface OrderRow {
-  key: string;
-  orderCode: string;
-  customer: string;
-  avatar: string;
-  date: string;
-  amount: number;
-  status: string;
-  payment: string;
-}
-
-const RECENT_ORDERS: OrderRow[] = [
-  { key: '1', orderCode: '#ORD-20260722-001', customer: 'Nguyễn Văn An', avatar: 'https://i.pravatar.cc/32?img=1', date: '22/07/2026 09:14', amount: 765000, status: 'PENDING', payment: 'COD' },
-  { key: '2', orderCode: '#ORD-20260722-002', customer: 'Trần Minh Phú', avatar: 'https://i.pravatar.cc/32?img=5', date: '22/07/2026 10:30', amount: 382500, status: 'PROCESSING', payment: 'MOMO' },
-  { key: '3', orderCode: '#ORD-20260722-003', customer: 'Lê Thị Hương', avatar: 'https://i.pravatar.cc/32?img=9', date: '22/07/2026 11:05', amount: 1250000, status: 'DELIVERING', payment: 'VN_PAY' },
-  { key: '4', orderCode: '#ORD-20260721-018', customer: 'Phạm Đức Hoàng', avatar: 'https://i.pravatar.cc/32?img=3', date: '21/07/2026 16:40', amount: 900000, status: 'DELIVERED', payment: 'COD' },
-  { key: '5', orderCode: '#ORD-20260721-015', customer: 'Đinh Thế Long', avatar: 'https://i.pravatar.cc/32?img=7', date: '21/07/2026 14:22', amount: 450000, status: 'CANCELLED', payment: 'MOMO' },
-];
-
-const STATUS_CONFIG: Record<string, { color: string; text: string; badge: 'success' | 'processing' | 'warning' | 'error' | 'default' }> = {
-  PENDING: { color: 'orange', text: 'Chờ xác nhận', badge: 'warning' },
-  PROCESSING: { color: 'blue', text: 'Đang xử lý', badge: 'processing' },
-  DELIVERING: { color: 'purple', text: 'Đang giao hàng', badge: 'processing' },
-  DELIVERED: { color: 'green', text: 'Đã giao', badge: 'success' },
-  CANCELLED: { color: 'red', text: 'Đã hủy', badge: 'error' },
-};
-
-const PAYMENT_CONFIG: Record<string, { color: string; text: string }> = {
-  COD: { color: 'default', text: 'COD' },
-  MOMO: { color: 'magenta', text: 'MoMo' },
-  VN_PAY: { color: 'blue', text: 'VNPay' },
-};
 
 const formatPrice = (price: number) =>
   new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
 
-const ORDER_COLUMNS: ColumnsType<OrderRow> = [
+// Cột bảng đơn hàng gần đây
+const buildOrderColumns = (): ColumnsType<OrderResponse> => [
   {
     title: 'Mã đơn',
-    dataIndex: 'orderCode',
-    key: 'orderCode',
-    render: (code: string) => (
-      <Text className="font-mono text-xs font-semibold text-slate-700">{code}</Text>
-    ),
+    dataIndex: 'id',
+    key: 'id',
+    render: (id: number) => <Text className="font-mono text-xs font-semibold text-slate-700">#{id}</Text>,
   },
   {
     title: 'Khách hàng',
-    dataIndex: 'customer',
     key: 'customer',
-    render: (name: string, record: OrderRow) => (
+    render: (_: any, record: any) => (
       <div className="flex items-center gap-2">
-        <Avatar src={record.avatar} size={28} />
-        <Text className="text-sm font-medium">{name}</Text>
+        <Avatar size={28} style={{ background: 'linear-gradient(135deg, #c5a880, #d4af37)' }}>
+          {(record.firstName?.[0] || record.lastName?.[0] || '?').toUpperCase()}
+        </Avatar>
+        <Text className="text-sm font-medium">{record.firstName} {record.lastName}</Text>
       </div>
     ),
   },
   {
     title: 'Ngày đặt',
-    dataIndex: 'date',
-    key: 'date',
-    render: (date: string) => <Text className="text-xs text-gray-500">{date}</Text>,
+    dataIndex: 'createdAt',
+    key: 'createdAt',
+    render: (date: string) => <Text className="text-xs text-gray-500">{date ? new Date(date).toLocaleString('vi-VN') : '—'}</Text>,
   },
   {
     title: 'Giá trị',
-    dataIndex: 'amount',
-    key: 'amount',
-    render: (amount: number) => (
-      <Text className="font-bold text-[#c5a880]">{formatPrice(amount)}</Text>
-    ),
+    dataIndex: 'finalAmount',
+    key: 'finalAmount',
+    render: (amount: number) => <Text className="font-bold text-[#c5a880]">{formatPrice(amount ?? 0)}</Text>,
     align: 'right',
   },
   {
     title: 'Thanh toán',
-    dataIndex: 'payment',
-    key: 'payment',
-    render: (payment: string) => {
-      const cfg = PAYMENT_CONFIG[payment];
-      return <Tag color={cfg?.color}>{cfg?.text || payment}</Tag>;
+    dataIndex: 'paymentMethod',
+    key: 'paymentMethod',
+    render: (method: any) => {
+      const cfg = PAYMENT_METHOD_MAP[method as keyof typeof PAYMENT_METHOD_MAP];
+      return <Tag>{cfg?.label || method}</Tag>;
     },
   },
   {
     title: 'Trạng thái',
-    dataIndex: 'status',
-    key: 'status',
-    render: (status: string) => {
-      const cfg = STATUS_CONFIG[status];
+    dataIndex: 'orderStatus',
+    key: 'orderStatus',
+    render: (status: any) => {
+      const cfg = ORDER_STATUS_MAP[status as GetAllOrdersOrderStatusEnum];
       return (
-        <Badge status={cfg?.badge || 'default'} text={
-          <Tag color={cfg?.color} className="!rounded-lg">
-            {cfg?.text || status}
-          </Tag>
-        } />
+        <span style={{
+          display: 'inline-flex', alignItems: 'center', gap: 6,
+          padding: '2px 10px', borderRadius: 20,
+          background: `${cfg?.color ?? '#888'}18`,
+          border: `1.5px solid ${cfg?.color ?? '#888'}`,
+          color: cfg?.color ?? '#888',
+          fontWeight: 700, fontSize: 11,
+        }}>
+          {cfg?.label ?? status}
+        </span>
       );
     },
   },
@@ -185,49 +97,104 @@ const ORDER_COLUMNS: ColumnsType<OrderRow> = [
   },
 ];
 
-// ── Low Stock Items ────────────────────────────────────────────
-const LOW_STOCK = [
-  { sku: 'POLO-WHITE-XL', name: 'Áo Polo Trắng / XL', qty: 3, maxQty: 50 },
-  { sku: 'BLAZER-NAVY-L', name: 'Áo Blazer Navy / L', qty: 5, maxQty: 30 },
-  { sku: 'DENIM-BLACK-S', name: 'Áo Denim Đen / S', qty: 2, maxQty: 40 },
-  { sku: 'TROUSER-GRAY-M', name: 'Quần Tây Xám / M', qty: 7, maxQty: 60 },
-];
-
-// ── Main Component ─────────────────────────────────────────────
 const AdminDashboardPage: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const { list: orders, totalElements, loading: ordersLoading } = useAppSelector((s) => s.adminOrders);
+  const { list: users } = useAppSelector((s) => s.users);
+  const { list: products } = useAppSelector((s) => s.products);
+
+  // Fetch dữ liệu thật khi mount
+  useEffect(() => {
+    dispatch(fetchAllAdminOrdersThunk({ pageable: { page: 0, size: 50 } }));
+    dispatch(fetchAllUsersThunk());
+    dispatch(fetchAllProductsThunk());
+  }, [dispatch]);
+
+  // Tính stats từ store
+  const stats = useMemo(() => {
+    const deliveredOrders = orders.filter((o: any) => o.orderStatus === GetAllOrdersOrderStatusEnum.Delivered);
+    const revenue = deliveredOrders.reduce((sum: number, o: any) => sum + (o.finalAmount ?? 0), 0);
+    const customerCount = users.filter((u: any) => (u.userRole || '').toUpperCase() === 'CUSTOMER').length;
+    // sản phẩm có soldQuantity > 0 — hiện chưa có stockQuantity, dùng đế́m tổng sản phẩm làm placeholder
+    const productCount = products.length;
+
+    return [
+      {
+        key: 'revenue', label: 'Doanh thu (đơn đã giao)', value: revenue,
+        icon: <DollarOutlined />, color: '#c5a880', bg: 'from-amber-50 to-orange-50',
+        suffix: '₫', isRevenue: true,
+      },
+      {
+        key: 'orders', label: 'Tổng đơn hàng', value: totalElements,
+        icon: <ShoppingOutlined />, color: '#1677ff', bg: 'from-blue-50 to-indigo-50',
+        suffix: ' đơn', isRevenue: false,
+      },
+      {
+        key: 'customers', label: 'Khách hàng', value: customerCount,
+        icon: <TeamOutlined />, color: '#52c41a', bg: 'from-green-50 to-emerald-50',
+        suffix: ' người', isRevenue: false,
+      },
+      {
+        key: 'products', label: 'Tổng sản phẩm', value: productCount,
+        icon: <InboxOutlined />, color: '#722ed1', bg: 'from-purple-50 to-violet-50',
+        suffix: ' SP', isRevenue: false,
+      },
+    ];
+  }, [orders, users, products, totalElements]);
+
+  // Tính phân bổ trạng thái đơn hàng từ store
+  const orderStatusCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    Object.keys(ORDER_STATUS_MAP).forEach(k => { counts[k] = 0; });
+    orders.forEach((o: any) => {
+      if (o.orderStatus && counts[o.orderStatus] !== undefined) {
+        counts[o.orderStatus]++;
+      }
+    });
+    return counts;
+  }, [orders]);
+
+  const totalOrdersLocal = Object.values(orderStatusCounts).reduce((a, b) => a + b, 0);
+
+  // Spread trước khi sort — Redux state bị freeze bởi Immer, không sort trực tiếp được
+  const lowStockItems = useMemo(() =>
+    [...products]
+      .sort((a: any, b: any) => (b.soldQuantity ?? 0) - (a.soldQuantity ?? 0))
+      .slice(0, 5),
+    [products]
+  );
+
+  // Đơn hàng gần đây — 5 đơn mới nhất
+  const recentOrders = useMemo(() => orders.slice(0, 5), [orders]);
+
+  const ORDER_COLUMNS = buildOrderColumns();
+
+  const handleRefresh = () => {
+    dispatch(fetchAllAdminOrdersThunk({ pageable: { page: 0, size: 50 } }));
+    dispatch(fetchAllUsersThunk());
+    dispatch(fetchAllProductsThunk());
+  };
+
   return (
     <div className="space-y-6">
-      {/* ── PAGE HEADER ─────────────────────────────────── */}
+      {/* PAGE HEADER */}
       <div className="flex items-center justify-between">
         <div>
-          <Title level={4} className="!mb-1">
-            Dashboard tổng quan 📊
-          </Title>
+          <Title level={4} className="!mb-1">Dashboard tổng quan 📊</Title>
           <Text className="text-gray-400 text-sm">
-            Cập nhật lúc 22/07/2026 — 22:30 ICT
+            Cập nhật lúc {new Date().toLocaleString('vi-VN')}
           </Text>
         </div>
         <Space>
-          <Select
-            defaultValue="thisMonth"
-            size="middle"
-            style={{ width: 140, borderRadius: 8 }}
-            options={[
-              { value: 'today', label: 'Hôm nay' },
-              { value: 'thisWeek', label: 'Tuần này' },
-              { value: 'thisMonth', label: 'Tháng này' },
-              { value: 'thisYear', label: 'Năm nay' },
-            ]}
-          />
-          <Button icon={<ReloadOutlined />} className="!rounded-lg">
+          <Button icon={<ReloadOutlined />} className="!rounded-lg" loading={ordersLoading} onClick={handleRefresh}>
             Làm mới
           </Button>
         </Space>
       </div>
 
-      {/* ── STATS CARDS ──────────────────────────────────── */}
+      {/* STATS CARDS — dữ liệu thật */}
       <Row gutter={[16, 16]}>
-        {STATS.map((stat) => (
+        {stats.map((stat) => (
           <Col key={stat.key} xs={24} sm={12} xl={6}>
             <Card
               className={`!rounded-2xl border-0 bg-gradient-to-br ${stat.bg} overflow-hidden`}
@@ -241,34 +208,23 @@ const AdminDashboardPage: React.FC = () => {
                   </Text>
                   <Statistic
                     value={stat.value}
-                    valueStyle={{
-                      color: stat.color,
-                      fontSize: 26,
-                      fontWeight: 800,
-                      lineHeight: 1.2,
-                    }}
+                    valueStyle={{ color: stat.color, fontSize: 26, fontWeight: 800, lineHeight: 1.2 }}
                     suffix={<span className="text-base font-bold">{stat.suffix}</span>}
                     formatter={(val) =>
-                      stat.key === 'revenue'
+                      stat.isRevenue
                         ? new Intl.NumberFormat('vi-VN').format(Number(val))
                         : val
                     }
                   />
-                  {stat.trend !== null && (
-                    <div className={`flex items-center gap-1 mt-2 text-xs font-semibold ${stat.trendUp ? 'text-green-600' : 'text-red-500'}`}>
-                      {stat.trendUp ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
-                      {stat.trend}% so với tháng trước
-                    </div>
-                  )}
-                  {stat.key === 'lowstock' && (
-                    <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-red-500">
-                      <WarningOutlined /> Cần nhập kho ngay
+                  {stat.key === 'products' && stat.value > 0 && (
+                    <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-purple-500">
+                      <InboxOutlined /> Tổng sản phẩm
                     </div>
                   )}
                 </div>
                 <div
                   className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl"
-                  style={{ background: `${stat.color}18` }}
+                  style={{ background: `${stat.color}18`, color: stat.color, fontSize: 20 }}
                 >
                   {stat.icon}
                 </div>
@@ -278,9 +234,9 @@ const AdminDashboardPage: React.FC = () => {
         ))}
       </Row>
 
-      {/* ── CONTENT ROW ──────────────────────────────────── */}
+      {/* CONTENT ROW */}
       <Row gutter={[16, 16]}>
-        {/* Recent Orders */}
+        {/* Đơn hàng gần đây */}
         <Col xs={24} xl={16}>
           <Card
             className="!rounded-2xl border-0"
@@ -292,79 +248,69 @@ const AdminDashboardPage: React.FC = () => {
               </div>
             }
             extra={
-              <Button type="link" className="!text-[#c5a880] !font-semibold">
+              <Button type="link" className="!text-[#c5a880] !font-semibold" onClick={() => window.location.href = '/admin/orders'}>
                 Xem tất cả →
               </Button>
             }
           >
             <Table
               columns={ORDER_COLUMNS}
-              dataSource={RECENT_ORDERS}
+              dataSource={recentOrders}
               pagination={false}
               size="middle"
-              rowKey="key"
+              rowKey="id"
+              loading={ordersLoading}
               className="rounded-xl overflow-hidden"
             />
           </Card>
         </Col>
 
-        {/* Low Stock Alert */}
+        {/* Top sản phẩm bán chạy */}
         <Col xs={24} xl={8}>
           <Card
             className="!rounded-2xl border-0 h-full"
             style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}
             title={
               <div className="flex items-center gap-2">
-                <InboxOutlined className="text-red-500" />
-                <span className="font-bold text-red-500">Sắp hết hàng</span>
-                <Tag color="red" className="!rounded-full">{LOW_STOCK.length}</Tag>
+                <InboxOutlined className="text-[#c5a880]" />
+                <span className="font-bold">Top bán chạy</span>
+                {lowStockItems.length > 0 && (
+                  <Tag color="gold" className="!rounded-full">{lowStockItems.length}</Tag>
+                )}
               </div>
-            }
-            extra={
-              <Button type="link" size="small" className="!text-[#c5a880] !font-semibold">
-                Quản lý kho →
-              </Button>
             }
           >
             <div className="space-y-4">
-              {LOW_STOCK.map((item) => (
-                <div key={item.sku}>
+              {lowStockItems.length > 0 ? lowStockItems.map((item: any) => (
+                <div key={item.id}>
                   <div className="flex justify-between items-center mb-1.5">
                     <Text className="text-sm font-medium text-slate-700 truncate max-w-[70%]">
-                      {item.name}
+                      {item.name || 'Sản phẩm'}
                     </Text>
-                    <Text
-                      className={`text-xs font-bold ${
-                        item.qty <= 3 ? 'text-red-500' : 'text-orange-500'
-                      }`}
-                    >
-                      còn {item.qty}
+                    <Text className="text-xs font-bold text-[#c5a880]">
+                      Đã bán: {item.soldQuantity ?? 0}
                     </Text>
                   </div>
                   <Progress
-                    percent={Math.round((item.qty / item.maxQty) * 100)}
+                    percent={Math.min(Math.round(((item.soldQuantity ?? 0) / 100) * 100), 100)}
                     showInfo={false}
-                    strokeColor={item.qty <= 3 ? '#ff4d4f' : '#faad14'}
+                    strokeColor="#c5a880"
                     trailColor="#f5f5f5"
                     size="small"
                     strokeLinecap="round"
                   />
-                  <Text className="text-[10px] text-gray-400">SKU: {item.sku}</Text>
                 </div>
-              ))}
-              <Button
-                block
-                className="!rounded-xl !mt-2 !border-dashed !border-orange-300 !text-orange-500 hover:!bg-orange-50"
-                icon={<InboxOutlined />}
-              >
-                Tạo phiếu nhập kho
-              </Button>
+              )) : (
+                <div className="text-center py-8 text-slate-400 text-sm">
+                  Chưa có dữ liệu sản phẩm
+                </div>
+              )}
             </div>
           </Card>
         </Col>
       </Row>
 
-      {/* ── ORDER STATUS SUMMARY ─────────────────────────── */}
+      {/* PHÂN BỔ TRẠNG THÁI ĐƠN HÀNG — dữ liệu thật */}
       <Card
         className="!rounded-2xl border-0"
         style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}
@@ -372,25 +318,32 @@ const AdminDashboardPage: React.FC = () => {
           <div className="flex items-center gap-2">
             <TeamOutlined className="text-[#c5a880]" />
             <span className="font-bold">Phân bổ trạng thái đơn hàng</span>
+            <span className="text-xs text-gray-400 font-normal">({orders.length} đơn hiển thị)</span>
           </div>
         }
       >
         <Row gutter={[16, 16]}>
-          {Object.entries(STATUS_CONFIG).map(([key, cfg]) => {
-            const counts: Record<string, number> = {
-              PENDING: 45, PROCESSING: 28, DELIVERING: 67, DELIVERED: 132, CANCELLED: 12,
-            };
-            const total = Object.values(counts).reduce((a, b) => a + b, 0);
-            const pct = Math.round((counts[key] / total) * 100);
+          {Object.entries(ORDER_STATUS_MAP).map(([key, cfg]) => {
+            const count = orderStatusCounts[key] ?? 0;
+            const pct = totalOrdersLocal > 0 ? Math.round((count / totalOrdersLocal) * 100) : 0;
             return (
               <Col key={key} xs={12} sm={8} md={24 / 5}>
                 <div className="text-center p-4 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer">
-                  <div className="text-2xl font-black text-slate-800">{counts[key]}</div>
-                  <Tag color={cfg.color} className="!rounded-full !mt-1 !text-xs">
-                    {cfg.text}
+                  <div className="text-2xl font-black text-slate-800">{count}</div>
+                  <Tag
+                    color={cfg.color === '#faad14' ? 'orange' : cfg.color === '#1677ff' ? 'blue' : cfg.color === '#52c41a' ? 'green' : cfg.color === '#389e0d' ? 'green' : 'red'}
+                    className="!rounded-full !mt-1 !text-xs"
+                  >
+                    {cfg.label}
                   </Tag>
                   <div className="text-xs text-gray-400 mt-1">{pct}% tổng đơn</div>
-                  <Progress percent={pct} showInfo={false} size="small" strokeColor={cfg.badge === 'success' ? '#52c41a' : cfg.badge === 'error' ? '#ff4d4f' : '#1677ff'} className="!mt-2" />
+                  <Progress
+                    percent={pct}
+                    showInfo={false}
+                    size="small"
+                    strokeColor={cfg.color}
+                    className="!mt-2"
+                  />
                 </div>
               </Col>
             );

@@ -6,7 +6,7 @@ All URIs are relative to *http://localhost:8080*
 |------------- | ------------- | -------------|
 |[**create2**](#create2) | **POST** /api/ranks | |
 |[**delete2**](#delete2) | **DELETE** /api/ranks/{id} | |
-|[**getAll1**](#getall1) | **GET** /api/ranks | |
+|[**getAll2**](#getall2) | **GET** /api/ranks | |
 |[**getById2**](#getbyid2) | **GET** /api/ranks/{id} | |
 |[**patch**](#patch) | **PATCH** /api/ranks/{id} | |
 |[**update2**](#update2) | **PUT** /api/ranks/{id} | |
@@ -112,8 +112,8 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **getAll1**
-> ApiResponseListRankResponse getAll1()
+# **getAll2**
+> ApiResponseListRankResponse getAll2()
 
 
 ### Example
@@ -127,7 +127,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new RankControllerApi(configuration);
 
-const { status, data } = await apiInstance.getAll1();
+const { status, data } = await apiInstance.getAll2();
 ```
 
 ### Parameters

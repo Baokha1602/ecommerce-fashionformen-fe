@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Drawer,
   Button,
@@ -95,6 +96,7 @@ interface CartDrawerProps {
 
 // ── Component ─────────────────────────────────────────────────
 const CartDrawer: React.FC<CartDrawerProps> = ({ open, onClose }) => {
+  const navigate = useNavigate();
   const [items, setItems] = useState<CartItem[]>(DUMMY_CART_ITEMS);
   const [voucherInput, setVoucherInput] = useState('');
   const [appliedVoucher, setAppliedVoucher] = useState<string | null>(null);
@@ -375,8 +377,29 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ open, onClose }) => {
                   boxShadow: '0 4px 15px rgba(197,168,128,0.4)',
                   fontSize: 15,
                 }}
+                onClick={() => {
+                  onClose();
+                  navigate('/checkout');
+                }}
               >
                 THANH TOÁN ({formatPrice(total)})
+              </Button>
+              <Button
+                type="default"
+                size="large"
+                block
+                className="!h-12 !rounded-xl !font-bold mt-3"
+                style={{
+                  borderColor: '#c5a880',
+                  color: '#c5a880',
+                  fontSize: 15,
+                }}
+                onClick={() => {
+                  onClose();
+                  navigate('/cart');
+                }}
+              >
+                XEM GIỎ HÀNG
               </Button>
               <button
                 onClick={onClose}

@@ -5,8 +5,12 @@ All URIs are relative to *http://localhost:8080*
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
 |[**deleteUser**](#deleteuser) | **DELETE** /api/users/{id} | |
+|[**getMyProfile**](#getmyprofile) | **GET** /api/users/me | |
 |[**getUserById**](#getuserbyid) | **GET** /api/users/{id} | |
 |[**getUsers**](#getusers) | **GET** /api/users | |
+|[**patchUser**](#patchuser) | **PATCH** /api/users/{id} | |
+|[**updateMyProfile**](#updatemyprofile) | **PUT** /api/users/profile | |
+|[**updateUser**](#updateuser) | **PUT** /api/users/{id} | |
 |[**updateUserStatus**](#updateuserstatus) | **PATCH** /api/users/{id}/status | |
 
 # **deleteUser**
@@ -41,6 +45,49 @@ const { status, data } = await apiInstance.deleteUser(
 ### Return type
 
 **ApiResponseVoid**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: */*
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getMyProfile**
+> ApiResponseUserResponse getMyProfile()
+
+
+### Example
+
+```typescript
+import {
+    AdminUserControllerApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new AdminUserControllerApi(configuration);
+
+const { status, data } = await apiInstance.getMyProfile();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**ApiResponseUserResponse**
 
 ### Authorization
 
@@ -159,6 +206,165 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
+ - **Accept**: */*
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **patchUser**
+> ApiResponseUserResponse patchUser(userUpdateRequest)
+
+
+### Example
+
+```typescript
+import {
+    AdminUserControllerApi,
+    Configuration,
+    UserUpdateRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new AdminUserControllerApi(configuration);
+
+let id: number; // (default to undefined)
+let userUpdateRequest: UserUpdateRequest; //
+
+const { status, data } = await apiInstance.patchUser(
+    id,
+    userUpdateRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **userUpdateRequest** | **UserUpdateRequest**|  | |
+| **id** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**ApiResponseUserResponse**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: */*
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateMyProfile**
+> ApiResponseUserResponse updateMyProfile(userUpdateRequest)
+
+
+### Example
+
+```typescript
+import {
+    AdminUserControllerApi,
+    Configuration,
+    UserUpdateRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new AdminUserControllerApi(configuration);
+
+let userUpdateRequest: UserUpdateRequest; //
+
+const { status, data } = await apiInstance.updateMyProfile(
+    userUpdateRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **userUpdateRequest** | **UserUpdateRequest**|  | |
+
+
+### Return type
+
+**ApiResponseUserResponse**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: */*
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateUser**
+> ApiResponseUserResponse updateUser(userUpdateRequest)
+
+
+### Example
+
+```typescript
+import {
+    AdminUserControllerApi,
+    Configuration,
+    UserUpdateRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new AdminUserControllerApi(configuration);
+
+let id: number; // (default to undefined)
+let userUpdateRequest: UserUpdateRequest; //
+
+const { status, data } = await apiInstance.updateUser(
+    id,
+    userUpdateRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **userUpdateRequest** | **UserUpdateRequest**|  | |
+| **id** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**ApiResponseUserResponse**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: */*
 
 

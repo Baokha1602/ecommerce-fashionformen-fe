@@ -6,7 +6,7 @@ All URIs are relative to *http://localhost:8080*
 |------------- | ------------- | -------------|
 |[**create1**](#create1) | **POST** /api/tags | |
 |[**delete1**](#delete1) | **DELETE** /api/tags/{id} | |
-|[**getAll**](#getall) | **GET** /api/tags | |
+|[**getAll1**](#getall1) | **GET** /api/tags | |
 |[**getById1**](#getbyid1) | **GET** /api/tags/{id} | |
 |[**update1**](#update1) | **PUT** /api/tags/{id} | |
 
@@ -111,8 +111,8 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **getAll**
-> ApiResponseListTagResponse getAll()
+# **getAll1**
+> ApiResponseListTagResponse getAll1()
 
 
 ### Example
@@ -126,7 +126,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new TagControllerApi(configuration);
 
-const { status, data } = await apiInstance.getAll();
+const { status, data } = await apiInstance.getAll1();
 ```
 
 ### Parameters

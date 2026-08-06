@@ -6,7 +6,7 @@ All URIs are relative to *http://localhost:8080*
 |------------- | ------------- | -------------|
 |[**create6**](#create6) | **POST** /api/banners | |
 |[**delete6**](#delete6) | **DELETE** /api/banners/{id} | |
-|[**getAll5**](#getall5) | **GET** /api/banners | |
+|[**getAll6**](#getall6) | **GET** /api/banners | |
 |[**getAllActive1**](#getallactive1) | **GET** /api/banners/active | |
 |[**getById6**](#getbyid6) | **GET** /api/banners/{id} | |
 |[**update6**](#update6) | **PUT** /api/banners/{id} | |
@@ -112,8 +112,8 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **getAll5**
-> ApiResponseListBannerResponse getAll5()
+# **getAll6**
+> ApiResponseListBannerResponse getAll6()
 
 
 ### Example
@@ -127,7 +127,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new BannerControllerApi(configuration);
 
-const { status, data } = await apiInstance.getAll5();
+const { status, data } = await apiInstance.getAll6();
 ```
 
 ### Parameters

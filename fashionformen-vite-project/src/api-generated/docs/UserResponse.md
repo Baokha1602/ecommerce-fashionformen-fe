@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 **email** | **string** |  | [optional] [default to undefined]
 **phone** | **string** |  | [optional] [default to undefined]
 **fullName** | **string** |  | [optional] [default to undefined]
-**avatarUrl** | **string** |  | [optional] [default to undefined]
+**avatarImage** | **string** |  | [optional] [default to undefined]
 **currentPoint** | **number** |  | [optional] [default to undefined]
 **userRole** | **string** |  | [optional] [default to undefined]
 **isActive** | **boolean** |  | [optional] [default to undefined]
@@ -30,7 +30,7 @@ const instance: UserResponse = {
     email,
     phone,
     fullName,
-    avatarUrl,
+    avatarImage,
     currentPoint,
     userRole,
     isActive,

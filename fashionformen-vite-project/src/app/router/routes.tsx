@@ -12,18 +12,35 @@ import ForgotPasswordPage from '@/features/auth/pages/ForgotPasswordPage';
 
 // ── Storefront Pages ──────────────────────────────────────────
 import LandingPage from '@/features/landing/pages/LandingPage';
+import ShopPage from '@/features/shop/pages/ShopPage';
 import ProductDetailPage from '@/features/shop/pages/ProductDetailPage';
+import { CartPage } from '@/features/cart/pages/CartPage';
+import { CheckoutPage } from '@/features/order/pages/CheckoutPage';
+import { OrderHistoryPage } from '@/features/order/pages/OrderHistoryPage';
+import { PaymentResultPage } from '@/features/order/pages/PaymentResultPage';
 
 // ── Admin Pages ───────────────────────────────────────────────
 import AdminDashboardPage from '@/features/admin/pages/AdminDashboardPage';
 import RanksPage from '@/features/ranks/pages/RanksPage';
-import CategoryPage from '@/features/category/pages/CategoryPage';
-import BrandsPage from '@/features/brands/pages/BrandsPage';
+import CategoryPage from '@/features/catalog/pages/CategoryPage';
+import BrandPage from '@/features/catalog/pages/BrandPage';
 import TagsPage from '@/features/tags/pages/TagsPage';
 import BannersPage from '@/features/banners/pages/BannersPage';
 import UsersPage from '@/features/users/pages/UsersPage';
 import StaffPage from '@/features/users/pages/StaffPage';
 import UserAddressPage from '@/features/user_address/pages/UserAddressPage';
+import ProductsPage from '@/features/products/pages/ProductsPage';
+import ProductImagesPage from '@/features/product_images/pages/ProductImagesPage';
+import ProductReviewsPage from '@/features/product_reviews/pages/ProductReviewsPage';
+import ProductTagsPage from '@/features/product_tags/pages/ProductTagsPage';
+import ProductVariantsPage from '@/features/product_variants/pages/ProductVariantsPage';
+import { CouponPage } from '@/features/coupon/pages/CouponPage';
+import { AdminOrdersPage } from '@/features/order/pages/AdminOrdersPage';
+import ProductPage from '@/features/catalog/pages/ProductPage';
+import ProductVariantPage from '@/features/catalog/pages/ProductVariantPage';
+import ProductImagePage from '@/features/catalog/pages/ProductImagePage';
+import ProductReviewPage from '@/features/catalog/pages/ProductReviewPage';
+import ProductTagPage from '@/features/catalog/pages/ProductTagPage';
 
 // ── Page Stub (placeholder cho các trang chưa xây dựng) ───────
 const PageStub = ({ name }: { name: string }) => (
@@ -49,17 +66,18 @@ export const router = createBrowserRouter([
     children: [
       // Public pages
       { path: '/', element: <LandingPage /> },
-      { path: '/shop', element: <PageStub name="Cửa hàng - Danh sách sản phẩm" /> },
+      { path: '/shop', element: <ShopPage /> },
       { path: '/shop/:slug', element: <ProductDetailPage /> },
-      { path: '/cart', element: <PageStub name="Giỏ hàng" /> },
-      { path: '/checkout', element: <PageStub name="Thanh toán" /> },
+      { path: '/cart', element: <CartPage /> },
+      { path: '/checkout', element: <CheckoutPage /> },
+      { path: '/payment-result', element: <PaymentResultPage /> },
 
       // Customer account routes (Cần đăng nhập)
       {
         element: <ProtectedRoute requireAuth={true} allowedRoles={['CUSTOMER', 'ADMIN', 'STAFF']} />,
         children: [
           { path: '/account', element: <PageStub name="Tài khoản của tôi" /> },
-          { path: '/account/orders', element: <PageStub name="Lịch sử đơn hàng" /> },
+          { path: '/account/orders', element: <OrderHistoryPage /> },
           { path: '/account/profile', element: <PageStub name="Hồ sơ cá nhân" /> },
           { path: '/account/addresses', element: <UserAddressPage /> },
         ],
@@ -99,7 +117,7 @@ export const router = createBrowserRouter([
           { path: '/profile', element: <PageStub name="Thông tin cá nhân" /> },
 
           // ── Vận hành & Hỗ trợ (ADMIN & STAFF) ────────────
-          { path: '/admin/orders', element: <PageStub name="Quản lý Đơn hàng" /> },
+          { path: '/admin/orders', element: <AdminOrdersPage /> },
           { path: '/admin/orders/shipping', element: <PageStub name="Xử lý Giao hàng" /> },
           { path: '/admin/inventory', element: <PageStub name="Quản lý Kho hàng" /> },
           { path: '/admin/support', element: <PageStub name="Hỗ trợ Khách hàng" /> },
@@ -109,9 +127,13 @@ export const router = createBrowserRouter([
             element: <ProtectedRoute requireAuth={true} allowedRoles={['ADMIN']} redirectTo="/admin" />,
             children: [
               // Catalog
-              { path: '/admin/products', element: <PageStub name="Quản lý Sản phẩm" /> },
+              { path: '/admin/products', element: <ProductPage /> },
+              { path: '/admin/products/variants', element: <ProductVariantPage /> },
+              { path: '/admin/products/images', element: <ProductImagePage /> },
+              { path: '/admin/products/reviews', element: <ProductReviewPage /> },
+              { path: '/admin/products/tags', element: <ProductTagPage /> },
               { path: '/admin/categories', element: <CategoryPage /> },
-              { path: '/admin/brands', element: <BrandsPage /> },
+              { path: '/admin/brands', element: <BrandPage /> },
               { path: '/admin/tags', element: <TagsPage /> },
 
               // Customers & Ranks
@@ -124,7 +146,7 @@ export const router = createBrowserRouter([
 
               // Marketing
               { path: '/admin/promotions', element: <PageStub name="Chương trình khuyến mãi" /> },
-              { path: '/admin/vouchers', element: <PageStub name="Mã giảm giá / Voucher" /> },
+              { path: '/admin/vouchers', element: <CouponPage /> },
               { path: '/admin/banners', element: <BannersPage /> },
 
               // Reports & System Settings

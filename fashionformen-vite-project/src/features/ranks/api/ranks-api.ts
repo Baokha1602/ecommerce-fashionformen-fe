@@ -10,9 +10,8 @@ const apiInstance = new RankControllerApi(
 );
 
 export const ranksApi = {
-  /** Lấy danh sách tất cả hạng thành viên */
   getAllRanks: async (): Promise<RankResponse[]> => {
-    const response = await apiInstance.getAll1();
+    const response = await apiInstance.getAll2();
     return (response.data as any).data ?? [];
   },
 

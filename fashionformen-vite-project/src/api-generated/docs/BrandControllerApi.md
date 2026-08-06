@@ -6,7 +6,7 @@ All URIs are relative to *http://localhost:8080*
 |------------- | ------------- | -------------|
 |[**create5**](#create5) | **POST** /api/brands | |
 |[**delete5**](#delete5) | **DELETE** /api/brands/{id} | |
-|[**getAll4**](#getall4) | **GET** /api/brands | |
+|[**getAll5**](#getall5) | **GET** /api/brands | |
 |[**getAllActive**](#getallactive) | **GET** /api/brands/active | |
 |[**getById5**](#getbyid5) | **GET** /api/brands/{id} | |
 |[**update5**](#update5) | **PUT** /api/brands/{id} | |
@@ -112,8 +112,8 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **getAll4**
-> ApiResponseListBrandResponse getAll4()
+# **getAll5**
+> ApiResponseListBrandResponse getAll5()
 
 
 ### Example
@@ -127,7 +127,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new BrandControllerApi(configuration);
 
-const { status, data } = await apiInstance.getAll4();
+const { status, data } = await apiInstance.getAll5();
 ```
 
 ### Parameters

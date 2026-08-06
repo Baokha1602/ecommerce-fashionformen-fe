@@ -12,7 +12,7 @@ const apiInstance = new CategoryControllerApi(
 export const categoryApi = {
   /** Lấy danh sách tất cả danh mục */
   getAllCategories: async (): Promise<CategoryResponse[]> => {
-    const response = await apiInstance.getAll3();
+    const response = await apiInstance.getAll4();
     return (response.data as any).data ?? [];
   },
 
