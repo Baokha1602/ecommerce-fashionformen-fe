@@ -54,35 +54,35 @@ const NAV_ENTRIES: NavEntry[] = [
   { key: '/admin', icon: <DashboardOutlined />, label: 'Dashboard', roles: ['ADMIN', 'STAFF'] },
 
   { type: 'divider', key: 'd-catalog', label: 'Catalog', roles: ['ADMIN'] },
-  { key: '/admin/products',   icon: <ShoppingOutlined />, label: 'Quản lý Sản phẩm',   roles: ['ADMIN'] },
-  { key: '/admin/categories', icon: <AppstoreOutlined />, label: 'Quản lý Danh mục',    roles: ['ADMIN'] },
-  { key: '/admin/brands',     icon: <BarcodeOutlined />,  label: 'Quản lý Thương hiệu', roles: ['ADMIN'] },
-  { key: '/admin/tags',       icon: <TagsOutlined />,     label: 'Quản lý Tags',         roles: ['ADMIN'] },
+  { key: '/admin/products', icon: <ShoppingOutlined />, label: 'Quản lý Sản phẩm', roles: ['ADMIN'] },
+  { key: '/admin/categories', icon: <AppstoreOutlined />, label: 'Quản lý Danh mục', roles: ['ADMIN'] },
+  { key: '/admin/brands', icon: <BarcodeOutlined />, label: 'Quản lý Thương hiệu', roles: ['ADMIN'] },
+  { key: '/admin/tags', icon: <TagsOutlined />, label: 'Quản lý Tags', roles: ['ADMIN'] },
 
   { type: 'divider', key: 'd-ops', label: 'Vận hành', roles: ['ADMIN', 'STAFF'] },
-  { key: '/admin/orders',          icon: <InboxOutlined />, label: 'Quản lý Đơn hàng', roles: ['ADMIN', 'STAFF'] },
+  { key: '/admin/orders', icon: <InboxOutlined />, label: 'Quản lý Đơn hàng', roles: ['ADMIN', 'STAFF'] },
   { key: '/admin/orders/shipping', icon: <TruckOutlined />, label: 'Xử lý Giao hàng', roles: ['ADMIN', 'STAFF'] },
-  { key: '/admin/inventory',       icon: <InboxOutlined />, label: 'Quản lý Kho hàng', roles: ['ADMIN', 'STAFF'] },
+  { key: '/admin/inventory', icon: <InboxOutlined />, label: 'Quản lý Kho hàng', roles: ['ADMIN', 'STAFF'] },
 
   { type: 'divider', key: 'd-customers', label: 'Khách hàng', roles: ['ADMIN'] },
-  { key: '/admin/customers',            icon: <TeamOutlined />,        label: 'Quản lý Khách hàng',      roles: ['ADMIN'] },
-  { key: '/admin/customers/ranks',      icon: <CrownOutlined />,       label: 'Quản lý Hạng thành viên', roles: ['ADMIN'] },
-  { key: '/admin/customers/addresses',  icon: <EnvironmentOutlined />, label: 'Quản lý Địa chỉ khách', roles: ['ADMIN'] },
+  { key: '/admin/customers', icon: <TeamOutlined />, label: 'Quản lý Người dùng', roles: ['ADMIN'] },
+  { key: '/admin/customers/ranks', icon: <CrownOutlined />, label: 'Quản lý Hạng thành viên', roles: ['ADMIN'] },
+  { key: '/admin/customers/addresses', icon: <EnvironmentOutlined />, label: 'Quản lý Địa chỉ        ', roles: ['ADMIN'] },
 
   { type: 'divider', key: 'd-hr', label: 'Nhân sự', roles: ['ADMIN'] },
   { key: '/admin/staff', icon: <UserSwitchOutlined />, label: 'Quản lý Nhân viên', roles: ['ADMIN'] },
 
   { type: 'divider', key: 'd-marketing', label: 'Marketing', roles: ['ADMIN'] },
-  { key: '/admin/promotions', icon: <GiftOutlined />,    label: 'Chương trình Khuyến mãi', roles: ['ADMIN'] },
-  { key: '/admin/vouchers',   icon: <TagsOutlined />,    label: 'Mã giảm giá / Voucher',   roles: ['ADMIN'] },
-  { key: '/admin/banners',    icon: <PictureOutlined />, label: 'Banner Quảng cáo',        roles: ['ADMIN'] },
+  { key: '/admin/promotions', icon: <GiftOutlined />, label: 'Chương trình Khuyến mãi', roles: ['ADMIN'] },
+  { key: '/admin/vouchers', icon: <TagsOutlined />, label: 'Mã giảm giá / Voucher', roles: ['ADMIN'] },
+  { key: '/admin/banners', icon: <PictureOutlined />, label: 'Banner Quảng cáo', roles: ['ADMIN'] },
 
   { type: 'divider', key: 'd-support', label: 'Hỗ trợ', roles: ['ADMIN', 'STAFF'] },
   { key: '/admin/support', icon: <CustomerServiceOutlined />, label: 'Hỗ trợ Khách hàng', roles: ['ADMIN', 'STAFF'] },
 
   { type: 'divider', key: 'd-system', label: 'Hệ thống', roles: ['ADMIN'] },
-  { key: '/admin/reports',  icon: <BarChartOutlined />, label: 'Báo cáo Doanh thu', roles: ['ADMIN'] },
-  { key: '/admin/settings', icon: <SettingOutlined />,  label: 'Cài đặt Hệ thống',  roles: ['ADMIN'] },
+  { key: '/admin/reports', icon: <BarChartOutlined />, label: 'Báo cáo Doanh thu', roles: ['ADMIN'] },
+  { key: '/admin/settings', icon: <SettingOutlined />, label: 'Cài đặt Hệ thống', roles: ['ADMIN'] },
 ];
 
 const AppSidebar: React.FC<AppSidebarProps> = ({ collapsed }) => {

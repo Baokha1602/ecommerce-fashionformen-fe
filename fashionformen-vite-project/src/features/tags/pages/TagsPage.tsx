@@ -140,8 +140,8 @@ const TagsPage: React.FC = () => {
             <TagsOutlined style={{ fontSize: 18, color: '#c5a880' }} />
           </div>
           <div>
-            <Title level={5} style={{ margin: 0, fontWeight: 700, color: '#1a1a1a' }}>Tags sản phẩm</Title>
-            <Text type="secondary" style={{ fontSize: 12 }}>Quản lý danh sách nhãn / tag sản phẩm ({list.length} tags)</Text>
+            <Title level={5} style={{ margin: 0, fontWeight: 700, color: '#1a1a1a' }}>Quản lý tag sản phẩm</Title>
+            <Text type="secondary" style={{ fontSize: 12 }}>Quản lý các nhãn dán của sản phẩm</Text>
           </div>
         </div>
         <Button

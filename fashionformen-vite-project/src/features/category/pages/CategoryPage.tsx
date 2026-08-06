@@ -42,9 +42,9 @@ const CategoryPage: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<CategoryResponse | null>(null);
   const [searchText, setSearchText] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'TRASH'>('ALL');
+  const [statusFilter, setStatusFilter] = useState<'ACTIVE' | 'DISABLED'>('ACTIVE');
 
-  // Quản lý trạng thái xóa mềm local nếu DTO chưa trả isActive
+  // Quản lý trạng thái vô hiệu hóa local nếu DTO chưa trả isActive
   const [softDeletedIds, setSoftDeletedIds] = useState<number[]>([]);
 
   useEffect(() => {
@@ -78,7 +78,7 @@ const CategoryPage: React.FC = () => {
     }
   };
 
-  // ── XÓA MỀM (SOFT DELETE / KHÔI PHỤC) ──
+  // ── VÔ HIỆU HÓA / KHÔI PHỤC ──
   const handleSoftDeleteToggle = (record: CategoryResponse) => {
     const isSoftDeleted = softDeletedIds.includes(record.id!);
     if (isSoftDeleted) {
@@ -86,39 +86,41 @@ const CategoryPage: React.FC = () => {
       message.success(`Đã khôi phục danh mục "${record.name}"!`);
     } else {
       setSoftDeletedIds((prev) => [...prev, record.id!]);
-      message.info(`Đã chuyển danh mục "${record.name}" vào Thùng rác (Xóa mềm)!`);
+      message.success(`Đã vô hiệu hóa danh mục "${record.name}"!`);
     }
   };
 
-  // ── XÓA CỨNG (HARD DELETE) ──
+  // ── XÓA ──
   const handleHardDelete = (record: CategoryResponse) => {
     modal.confirm({
-      title: '⚠️ CẢNH BÁO: Xóa vĩnh viễn (Xóa cứng)',
+      title: 'Xác nhận xóa',
       icon: <ExclamationCircleOutlined className="text-red-500" />,
       content: (
         <div>
-          <p>Bạn có chắc chắn muốn <strong>xóa vĩnh viễn danh mục</strong> <span className="text-red-600 font-bold">"{record.name}"</span> không?</p>
-          <p className="text-xs text-gray-500 mt-1">Dữ liệu sẽ bị xóa hoàn toàn khỏi cơ sở dữ liệu và không thể khôi phục!</p>
+          <p>Bạn có chắc chắn muốn xóa danh mục <strong>"{record.name}"</strong>?</p>
         </div>
       ),
-      okText: 'Xóa vĩnh viễn',
+      okText: 'Xóa',
       okButtonProps: { danger: true },
       cancelText: 'Hủy',
       onOk: async () => {
         const result = await dispatch(deleteCategoryThunk(record.id!));
         if (deleteCategoryThunk.fulfilled.match(result)) {
           setSoftDeletedIds((prev) => prev.filter((id) => id !== record.id));
-          message.success(`Đã xóa vĩnh viễn danh mục "${record.name}" thành công!`);
+          message.success(`Đã xóa danh mục "${record.name}" thành công!`);
         }
       },
     });
   };
 
   const categories = ensureArray(list);
+  const activeCount = categories.filter(c => !softDeletedIds.includes(c.id!)).length;
+  const disabledCount = softDeletedIds.length;
+
   const filteredList = categories.filter((c) => {
     const isSoftDeleted = softDeletedIds.includes(c.id!);
     if (statusFilter === 'ACTIVE' && isSoftDeleted) return false;
-    if (statusFilter === 'TRASH' && !isSoftDeleted) return false;
+    if (statusFilter === 'DISABLED' && !isSoftDeleted) return false;
 
     if (!searchText) return true;
     return c.name?.toLowerCase().includes(searchText.toLowerCase());
@@ -193,7 +195,7 @@ const CategoryPage: React.FC = () => {
                 flexShrink: 0,
               }}
             />
-            {!isSoftDeleted ? 'Hoạt động' : 'Đã xóa mềm'}
+            {!isSoftDeleted ? 'Hoạt động' : 'Vô hiệu hóa'}
           </span>
         );
       },
@@ -229,7 +231,7 @@ const CategoryPage: React.FC = () => {
               />
             </Tooltip>
 
-            <Tooltip title={isSoftDeleted ? 'Khôi phục hoạt động' : 'Xóa mềm (Chuyển vào Thùng rác)'}>
+            <Tooltip title={isSoftDeleted ? 'Khôi phục' : 'Vô hiệu hóa'}>
               <Button
                 type="text"
                 size="small"
@@ -239,7 +241,7 @@ const CategoryPage: React.FC = () => {
               />
             </Tooltip>
 
-            <Tooltip title="Xóa cứng (Vĩnh viễn khỏi Database)">
+            <Tooltip title="Xóa">
               <Button
                 type="text"
                 size="small"
@@ -275,10 +277,10 @@ const CategoryPage: React.FC = () => {
           </div>
           <div>
             <Title level={5} style={{ margin: 0, fontWeight: 700, color: '#1a1a1a' }}>
-              Quản lý Danh mục (Soft & Hard Delete)
+              Quản lý Danh mục
             </Title>
             <Text type="secondary" style={{ fontSize: 12 }}>
-              Hỗ trợ xóa mềm (Chuyển thùng rác) & xóa cứng (Xóa vĩnh viễn)
+              Quản lý các danh mục sản phẩm
             </Text>
           </div>
         </div>
@@ -286,12 +288,11 @@ const CategoryPage: React.FC = () => {
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           <Segmented
             options={[
-              { label: `Tất cả (${categories.length})`, value: 'ALL' },
-              { label: 'Hoạt động', value: 'ACTIVE' },
-              { label: `Thùng rác (${softDeletedIds.length})`, value: 'TRASH' },
+              { label: `Hoạt động (${activeCount})`, value: 'ACTIVE' },
+              { label: `Vô hiệu hóa (${disabledCount})`, value: 'DISABLED' },
             ]}
             value={statusFilter}
-            onChange={(v) => setStatusFilter(v as 'ALL' | 'ACTIVE' | 'TRASH')}
+            onChange={(v) => setStatusFilter(v as 'ACTIVE' | 'DISABLED')}
           />
 
           <Button

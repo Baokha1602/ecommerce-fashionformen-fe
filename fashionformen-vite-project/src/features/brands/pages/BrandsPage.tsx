@@ -28,7 +28,7 @@ const BrandsPage: React.FC = () => {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<BrandResponse | null>(null);
-  const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'TRASH'>('ALL');
+  const [statusFilter, setStatusFilter] = useState<'ACTIVE' | 'DISABLED'>('ACTIVE');
 
   useEffect(() => {
     dispatch(fetchAllBrandsThunk());
@@ -61,10 +61,10 @@ const BrandsPage: React.FC = () => {
     }
   };
 
-  // ── XÓA MỀM (Soft Delete / Vô hiệu hóa hoặc Khôi phục) ──
+  // ── VÔ HIỆU HÓA / KHÔI PHỤC ──
   const handleSoftDeleteToggle = async (record: BrandResponse) => {
     const newStatus = !(record.isActive ?? true);
-    const actionText = newStatus ? 'Khôi phục' : 'Xóa mềm (Ẩn)';
+    const actionText = newStatus ? 'Khôi phục' : 'Vô hiệu hóa';
     const result = await dispatch(updateBrandThunk({
       id: record.id!,
       body: {
@@ -79,33 +79,36 @@ const BrandsPage: React.FC = () => {
     }
   };
 
-  // ── XÓA CỨNG (Hard Delete / Xóa vĩnh viễn khỏi Database) ──
+  // ── XÓA ──
   const handleHardDelete = (record: BrandResponse) => {
     modal.confirm({
-      title: '⚠️ CẢNH BÁO: Xóa vĩnh viễn (Xóa cứng)',
+      title: 'Xác nhận xóa',
       icon: <ExclamationCircleOutlined className="text-red-500" />,
       content: (
         <div>
-          <p>Hành động này sẽ <strong>xóa hoàn toàn dữ liệu thương hiệu</strong> <span className="text-red-600 font-bold">"{record.name}"</span> khỏi hệ thống.</p>
-          <p className="text-xs text-gray-500 mt-1">Không thể khôi phục lại dữ liệu sau khi xóa cứng!</p>
+          <p>Bạn có chắc chắn muốn xóa thương hiệu <strong>"{record.name}"</strong>?</p>
         </div>
       ),
-      okText: 'Xóa vĩnh viễn',
+      okText: 'Xóa',
       okButtonProps: { danger: true },
-      cancelText: 'Hủy bỏ',
+      cancelText: 'Hủy',
       onOk: async () => {
         const result = await dispatch(deleteBrandThunk(record.id!));
         if (deleteBrandThunk.fulfilled.match(result)) {
-          message.success(`Đã xóa vĩnh viễn thương hiệu "${record.name}"!`);
+          message.success(`Đã xóa thương hiệu "${record.name}" thành công!`);
         }
       },
     });
   };
 
   const brandList = ensureArray(list);
+  const activeCount = brandList.filter(b => b.isActive !== false).length;
+  const disabledCount = brandList.filter(b => b.isActive === false).length;
+
   const filteredBrands = brandList.filter((b) => {
-    if (statusFilter === 'ACTIVE') return b.isActive !== false;
-    if (statusFilter === 'TRASH') return b.isActive === false;
+    const isActive = b.isActive !== false;
+    if (statusFilter === 'ACTIVE' && !isActive) return false;
+    if (statusFilter === 'DISABLED' && isActive) return false;
     return true;
   });
 
@@ -170,7 +173,7 @@ const BrandsPage: React.FC = () => {
             }}
           >
             <span style={{ width: 7, height: 7, borderRadius: '50%', background: active ? '#52c41a' : '#ff4d4f', flexShrink: 0 }} />
-            {active ? 'Hoạt động' : 'Đã xóa mềm'}
+            {active ? 'Hoạt động' : 'Vô hiệu hóa'}
           </span>
         );
       },
@@ -200,8 +203,8 @@ const BrandsPage: React.FC = () => {
               />
             </Tooltip>
 
-            {/* Xóa mềm / Khôi phục */}
-            <Tooltip title={active ? "Xóa mềm (Tạm khóa / Ẩn)" : "Khôi phục hoạt động"}>
+            {/* Vô hiệu hóa / Khôi phục */}
+            <Tooltip title={active ? "Vô hiệu hóa" : "Khôi phục"}>
               <Button
                 type="text" size="small"
                 icon={active ? <StopOutlined /> : <UndoOutlined />}
@@ -210,8 +213,8 @@ const BrandsPage: React.FC = () => {
               />
             </Tooltip>
 
-            {/* Xóa cứng (Vĩnh viễn) */}
-            <Tooltip title="Xóa cứng (Vĩnh viễn khỏi Database)">
+            {/* Xóa */}
+            <Tooltip title="Xóa">
               <Button
                 type="text" size="small" danger icon={<DeleteOutlined />}
                 onClick={() => handleHardDelete(record)}
@@ -238,24 +241,23 @@ const BrandsPage: React.FC = () => {
           </div>
           <div>
             <Title level={5} style={{ margin: 0, fontWeight: 700, color: '#1a1a1a' }}>
-              Quản lý Thương hiệu (Soft & Hard Delete)
+              Quản lý Thương hiệu
             </Title>
             <Text type="secondary" style={{ fontSize: 12 }}>
-              Hỗ trợ xóa mềm (Vô hiệu hóa) & xóa cứng (Xóa vĩnh viễn)
+             Quản ly các thương hiệu của sản phẩm 
             </Text>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Bộ lọc trạng thái Xóa mềm / Thùng rác */}
+          {/* Bộ lọc trạng thái */}
           <Segmented
             options={[
-              { label: `Tất cả (${brandList.length})`, value: 'ALL' },
-              { label: 'Hoạt động', value: 'ACTIVE' },
-              { label: 'Thùng rác / Đã ẩn', value: 'TRASH' },
+              { label: `Hoạt động (${activeCount})`, value: 'ACTIVE' },
+              { label: `Vô hiệu hóa (${disabledCount})`, value: 'DISABLED' },
             ]}
             value={statusFilter}
-            onChange={(v) => setStatusFilter(v as 'ALL' | 'ACTIVE' | 'TRASH')}
+            onChange={(v) => setStatusFilter(v as 'ACTIVE' | 'DISABLED')}
           />
 
           <Button
